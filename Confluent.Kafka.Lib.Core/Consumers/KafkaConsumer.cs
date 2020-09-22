@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Confluent.Kafka.Lib.Core
+namespace Confluent.Kafka.Lib.Core.Consumers
 {
     public class KafkaConsumer : IKafkaConsumer, IDisposable
     {

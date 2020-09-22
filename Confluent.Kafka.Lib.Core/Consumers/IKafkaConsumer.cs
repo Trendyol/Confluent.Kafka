@@ -1,6 +1,8 @@
-namespace Confluent.Kafka.Lib.Core
+using System;
+
+namespace Confluent.Kafka.Lib.Core.Consumers
 {
-    public interface IKafkaConsumer
+    public interface IKafkaConsumer : IDisposable
     {
         
     }
