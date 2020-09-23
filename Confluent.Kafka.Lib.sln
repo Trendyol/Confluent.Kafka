@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Confluent.Kafka.Lib.Core", "Confluent.Kafka.Lib.Core\Confluent.Kafka.Lib.Core.csproj", "{63BD82DF-14A3-4CE5-983B-D95FDBEF2179}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Confluent.Kafka.Lib.Core", "src\Confluent.Kafka.Lib.Core\Confluent.Kafka.Lib.Core.csproj", "{3D7334D5-9427-4A77-BD9B-83E9F692A733}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -8,9 +8,9 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{63BD82DF-14A3-4CE5-983B-D95FDBEF2179}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{63BD82DF-14A3-4CE5-983B-D95FDBEF2179}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{63BD82DF-14A3-4CE5-983B-D95FDBEF2179}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{63BD82DF-14A3-4CE5-983B-D95FDBEF2179}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D7334D5-9427-4A77-BD9B-83E9F692A733}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D7334D5-9427-4A77-BD9B-83E9F692A733}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D7334D5-9427-4A77-BD9B-83E9F692A733}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D7334D5-9427-4A77-BD9B-83E9F692A733}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
