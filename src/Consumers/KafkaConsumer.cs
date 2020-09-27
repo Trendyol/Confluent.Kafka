@@ -40,7 +40,7 @@ namespace Confluent.Kafka.Lib.Core.Consumers
             _commitPeriod = commitPeriod;
         }
 
-        public async Task Run(CancellationToken token, ConsumerType consumerType)
+        public async Task Run(CancellationToken token, ConsumerType consumerType) // TODO: Split Run Method into Smaller Methods
         {
             try
             {
