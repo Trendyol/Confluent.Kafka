@@ -1,8 +1,7 @@
 namespace Confluent.Kafka.Lib.Core
 {
-    internal class Constants
+    internal static class Constants
     {
-        public const string RetryCount = nameof(RetryCount);
-        public const int MaxRetryValue = 3;
+        public const string RetryCountHeaderKey = nameof(RetryCountHeaderKey);
     }
 }

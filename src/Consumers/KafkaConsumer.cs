@@ -2,144 +2,126 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Confluent.Kafka.Lib.Core.Extensions;
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Hosting;
+using static Confluent.Kafka.Lib.Core.Constants;
 
 namespace Confluent.Kafka.Lib.Core.Consumers
 {
-    public abstract class KafkaConsumer : IKafkaConsumer, IDisposable
+    public abstract class KafkaConsumer : BackgroundService
     {
         private bool _disposed;
-        private readonly string _topic;
-        private readonly IConsumer<string, string> _consumer;
-        private readonly IProducer<string, string> _producer;
-        private readonly ILogger<KafkaConsumer> _logger;
-        private readonly int _commitPeriod;
+        private string _topic;
+        private IConsumer<string, string> _consumer;
+        private IProducer<string, string> _producer;
+        private int _commitPeriod;
+        private int _maxRetryCount;
 
-        public KafkaConsumer(ConsumerConfig consumerConfig,
-            ProducerConfig errorProducerConfig,
+        private void SetFields(ConsumerConfig consumerConfig,
+            ProducerConfig producerConfig,
             string topic,
             int commitPeriod,
-            ILogger<KafkaConsumer> logger)
+            int maxRetryCount)
         {
-            if (consumerConfig == null || errorProducerConfig == null)
+            if (consumerConfig == null || producerConfig == null)
             {
                 throw new ArgumentNullException("Config values cannot be null.");
             }
+
             if (commitPeriod < 1)
             {
                 throw new ArgumentException("Commit period should at least be 1.");
             }
 
+            if (consumerConfig.EnableAutoCommit == true)
+            {
+                throw new ArgumentException(
+                    "Auto commit is not supported due to possible loss of messages during auto commit.");
+            }
+
+            if (maxRetryCount < 1)
+            {
+                throw new ArgumentException("Commit period should at least be 1.");
+            }
+
             var consumerBuilder = new ConsumerBuilder<string, string>(consumerConfig);
-            var producerBuilder = new ProducerBuilder<string, string>(errorProducerConfig);
+            var producerBuilder = new ProducerBuilder<string, string>(producerConfig);
 
             _consumer = consumerBuilder.Build();
             _producer = producerBuilder.Build();
             _topic = topic ?? throw new ArgumentNullException(nameof(topic));
-            _logger = logger ?? throw new ArgumentNullException(nameof(Logger<KafkaConsumer>));
+            _maxRetryCount = maxRetryCount;
             _commitPeriod = commitPeriod;
         }
 
-        public async Task Run(CancellationToken token, ConsumerType consumerType) // TODO: Split Run Method into Smaller Methods
+        protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            Task.Factory.StartNew(async () => await Run(stoppingToken),
+                stoppingToken, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+
+            return Task.CompletedTask;
+        }
+
+        public async Task Run(CancellationToken token)
+        {
+            RETRY:
+
             try
             {
-                var success = await Try(() => { _consumer.Subscribe(_topic); }, 5, token);
-
-                if (!success)
-                {
-                    _logger.LogError($"Consumer : {GetType().Name} is down because of fatal error.");
-                    return;
-                }
-
-                var period = _commitPeriod;
+                _consumer.Subscribe(_topic);
 
                 while (!token.IsCancellationRequested)
                 {
-                    ConsumeResult<string, string> result = null;
-                    
                     try
                     {
-                        result = _consumer.Consume(token);
-                    }
-                    catch (KafkaException e)
-                    {
-                        _logger.LogError(e.ToString());
-                        
-                        if (e.Error.Code == ErrorCode.Local_UnknownTopic ||
-                            e.Error.Code == ErrorCode.Local_UnknownPartition ||
-                            e.Error.IsFatal)
+                        var result = _consumer.Consume(token);
+
+                        if (result?.Message == null)
                         {
-                            _logger.LogError($"Consumer : {GetType().Name} is ending because of fatal error.");
-                            return;
+                            continue;
                         }
-                        
-                        continue;
-                    }
-                    
-                    if (result?.Message == null)
-                    {
-                        continue;
-                    }
 
-                    try
-                    {
-                        if (consumerType == ConsumerType.Retry)
-                        {
-                            var message = result.Message;
+                        result.Message.IncrementHeaderValueAsInt(RetryCountHeaderKey);
 
-                            message.IncrementHeaderValueAsInt(Constants.RetryCount);
-                        }
-                        
-                        await OnConsume(result);
-                    }
-                    catch (Exception e)
-                    {
-                        _logger.LogError(e.ToString());
-                        
-                        var message = result.Message;
-
-                        var retryCount = message.GetHeaderValue<int>(Constants.RetryCount);
-
-                        if (consumerType == ConsumerType.Retry)
-                        {
-                            if (retryCount > Constants.MaxRetryValue)
-                            {
-                                var failedTopic = _topic + ".FAILED";
-
-                                await _producer.ProduceAsync(failedTopic, message, token); // TODO: Produce can throw
-                            }
-                            else
-                            {
-                                var errorTopic = _topic + ".ERROR";
-
-                                await _producer.ProduceAsync(errorTopic, message, token);
-                            }
-                        }
-                        else
-                        {
-                            var errorTopic = _topic + ".ERROR";
-
-                            await _producer.ProduceAsync(errorTopic, message, token);
-                        }
-                    }
-
-                    --period;
-
-                    if (period == 0)
-                    {
                         try
                         {
-                            _consumer.Commit();
+                            await OnConsume(result);
                         }
                         catch (Exception e)
                         {
-                            _logger.LogError(e.ToString());
-                            _logger.LogError($"Consumer : {GetType().Name} is down because of commit error.");
-                            return;
+                            await OnError(e);
+                            
+                            var currentRetryCount = result.Message.GetHeaderValue<int>(RetryCountHeaderKey);
+
+                            if (currentRetryCount > _maxRetryCount)
+                            {
+                                var errorTopic = _topic + ".error";
+
+                                await _producer.ProduceAsync(errorTopic, result.Message, token);
+                            }
+                            else
+                            {
+#pragma warning disable 4014 // Don't await, it will fire after 15 minutes
+                                Task.Delay(TimeSpan.FromMinutes(15), token)
+                                    .ContinueWith(_ => _producer.Produce(_topic, result.Message), token);
+#pragma warning restore 4014
+                            }
                         }
 
-                        period = _commitPeriod;
+                        if (result.Offset % _commitPeriod == 0)
+                        {
+                            try
+                            {
+                                _consumer.Commit(result);
+                            }
+                            catch (KafkaException e)
+                            {
+                                await OnError(e);
+                            }
+                        }
+                    }
+                    catch (ConsumeException e)
+                    {
+                        await OnError(e);
                     }
                 }
             }
@@ -152,69 +134,30 @@ namespace Confluent.Kafka.Lib.Core.Consumers
             catch (AccessViolationException)
             {
             }
-        }
-
-        private async Task<bool> Try(Action action,
-            int times,
-            CancellationToken token)
-        {
-            var millisecondsDelay = 50;
-
-            RETRY:
-
-            if (token.IsCancellationRequested)
-            {
-                return false;
-            }
-
-            try
-            {
-                action();
-
-                return true;
-            }
             catch (Exception e)
             {
-                _logger.LogError(e.ToString());
+                await OnError(e);
 
-                await Task.Delay(millisecondsDelay, token);
+                await Task.Delay(50, token);
 
-                millisecondsDelay *= 2;
-                times--;
-
-                if (times > 0)
-                {
-                    goto RETRY;
-                }
-
-                return false;
+                goto RETRY;
             }
         }
 
         protected abstract Task OnConsume(ConsumeResult<string, string> consumeResult);
+        protected abstract Task OnError(Exception exception);
 
-        #region DISPOSE_PATTERN
-
-        protected virtual void Dispose(bool disposing)
+        public override void Dispose()
         {
             if (_disposed)
             {
                 return;
             }
 
-            if (disposing)
-            {
-                _consumer?.Close();
-            }
-
             _disposed = true;
+            _consumer?.Close();
+            _producer?.Dispose();
+            base.Dispose();
         }
-
-        public void Dispose()
-        {
-            Dispose(true);
-        }
-
-        #endregion
     }
 }
