@@ -1,16 +1,15 @@
 using System;
 using System.Threading.Tasks;
 using Confluent.Kafka.Lib.Core.Consumers;
-using Microsoft.AspNetCore.Components.RenderTree;
 using Microsoft.Extensions.Logging;
 
 namespace Confluent.Kafka.Lib.Example
 {
-    public class OmsConsumer : KafkaConsumer
+    public class TestConsumer : KafkaConsumer
     {
-        private readonly ILogger<OmsConsumer> _logger;
+        private readonly ILogger<TestConsumer> _logger;
 
-        public OmsConsumer(ILogger<OmsConsumer> logger)
+        public TestConsumer(ILogger<TestConsumer> logger)
         {
             _logger = logger;
         }

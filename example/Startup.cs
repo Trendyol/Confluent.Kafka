@@ -10,8 +10,8 @@ namespace Confluent.Kafka.Lib.Example
         {
             services.AddHealthChecks();
             
-            services.AddKafkaConsumer<OmsConsumer>(
-                "10.10.36.211:9092",
+            services.AddKafkaConsumer<TestConsumer>(
+                "test-bootstrap-servers",
                 "test-topic",
                 "test-group-id");
         }
