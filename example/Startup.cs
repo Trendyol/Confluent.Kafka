@@ -2,7 +2,7 @@ using Confluent.Kafka.Lib.Core.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Confluent.Kafka.Lib.Core
+namespace Confluent.Kafka.Lib.Example
 {
     public class Startup
     {

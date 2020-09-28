@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -6,9 +5,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NLog.Web;
 
-namespace Confluent.Kafka.Lib.Core
+namespace Confluent.Kafka.Lib.Example
 {
-    public class Program
+    public static class Program
     {
         public static IConfiguration Configuration { get; set; }
         

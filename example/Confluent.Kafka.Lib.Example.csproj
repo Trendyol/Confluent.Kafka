@@ -1,0 +1,62 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <RootNamespace>Confluent.Kafka.Lib.Example</RootNamespace>
+        <LangVersion>latest</LangVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Remove="appsettings.Development.json"/>
+        <None Remove="appsettings.json"/>
+        <None Remove="nlog.config"/>
+        <None Remove="nlog.production.config"/>
+        <None Remove="nlog.test.config"/>
+        <None Remove="nlog.staging.config"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="appsettings.Development.json"/>
+        <Content Include="appsettings.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+        <Content Include="nlog.config">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+        <Content Include="nlog.production.config">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+        <Content Include="nlog.test.config">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Update="nlog.staging.config">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Confluent.Kafka" Version="1.5.0"/>
+        <PackageReference Include="Microsoft.AspNetCore" Version="2.2.0"/>
+        <PackageReference Include="Microsoft.AspNetCore.Diagnostics.HealthChecks" Version="2.2.0"/>
+        <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.2.7"/>
+        <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.2.0"/>
+
+        <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="3.1.7"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.7"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.7"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.7"/>
+
+        <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.9.10"/>
+
+        <PackageReference Include="NLog.Extensions.Logging" Version="1.6.1"/>
+        <PackageReference Include="NLog.Targets.ElasticSearch" Version="7.4.0"/>
+        <PackageReference Include="NLog.Web.AspNetCore" Version="4.9.0"/>
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\src\Confluent.Kafka.Lib.Core.csproj"/>
+    </ItemGroup>
+</Project>

@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <OutputType>Exe</OutputType>
         <TargetFramework>netcoreapp3.1</TargetFramework>
         <RootNamespace>Confluent.Kafka.Lib.Core</RootNamespace>
         <LangVersion>latest</LangVersion>
@@ -13,22 +12,6 @@
         <None Remove="nlog.config" />
         <None Remove="nlog.production.config" />
         <None Remove="nlog.test.config" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <Content Include="appsettings.Development.json" />
-        <Content Include="appsettings.json">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Content>
-        <Content Include="nlog.config">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Content>
-        <Content Include="nlog.production.config">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Content>
-        <Content Include="nlog.test.config">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Content>
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="Confluent.Kafka" Version="1.5.0" />
@@ -49,10 +32,5 @@
         <PackageReference Include="NLog.Web.AspNetCore" Version="4.9.0" />
         <PackageReference Include="Npgsql" Version="4.1.4" />
         <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
-    </ItemGroup>
-    <ItemGroup>
-        <None Update="nlog.staging.config">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
     </ItemGroup>
 </Project>
