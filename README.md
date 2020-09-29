@@ -13,7 +13,7 @@ You can open issues and all PRs are welcome.
 
 You can register your KafkaConsumer from `ConfigureServices` method in your `Startup`:
 
-```
+``` cs
 public void ConfigureServices(IServiceCollection services)
         {
             services.AddHealthChecks();
@@ -27,7 +27,7 @@ public void ConfigureServices(IServiceCollection services)
 
 Creating a new `KafkaConsumer`:
 
-```
+``` cs
 public class TestConsumer : KafkaConsumer
     {
         private readonly ILogger<TestConsumer> _logger;
