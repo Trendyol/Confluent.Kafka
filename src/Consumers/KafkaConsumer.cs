@@ -61,7 +61,7 @@ namespace Confluent.Kafka.Lib.Core.Consumers
             return Task.CompletedTask;
         }
 
-        public async Task Run(CancellationToken token)
+        private async Task Run(CancellationToken token)
         {
             RETRY:
 
@@ -74,6 +74,8 @@ namespace Confluent.Kafka.Lib.Core.Consumers
                     try
                     {
                         var result = _consumer.Consume(token);
+
+                        _consumer.Consume(TimeSpan.FromSeconds(3));
 
                         if (result?.Message == null)
                         {
