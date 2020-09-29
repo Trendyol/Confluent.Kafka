@@ -19,6 +19,7 @@ namespace Confluent.Kafka.Lib.Core.Extensions
             {
                 BootstrapServers = bootstrapServers,
                 AutoOffsetReset = AutoOffsetReset.Earliest,
+                EnableAutoCommit = false,
                 GroupId = groupId,
             };
             var producerConfig = new ProducerConfig
