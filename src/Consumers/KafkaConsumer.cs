@@ -7,15 +7,19 @@ using static Confluent.Kafka.Lib.Core.Constants;
 
 namespace Confluent.Kafka.Lib.Core.Consumers
 {
+    // TODO: Remove code duplication
     public abstract class KafkaConsumer : BackgroundService
     {
         private bool _disposed;
         private string _topic;
         private IConsumer<string, string> _consumer;
+        private IConsumer<string, string> _retryConsumer;
         private IProducer<string, string> _producer;
         private int _commitPeriod;
         private int _maxRetryCount;
-
+        private Timer _retryConsumerTimer;
+        private CancellationToken _cancellationToken;
+        
         private void SetFields(ConsumerConfig consumerConfig,
             ProducerConfig producerConfig,
             string topic,
@@ -44,26 +48,111 @@ namespace Confluent.Kafka.Lib.Core.Consumers
             }
 
             var consumerBuilder = new ConsumerBuilder<string, string>(consumerConfig);
+            var retryConsumerBuilder = new ConsumerBuilder<string, string>(consumerConfig);
             var producerBuilder = new ProducerBuilder<string, string>(producerConfig);
 
             _consumer = consumerBuilder.Build();
+            _retryConsumer = retryConsumerBuilder.Build();
             _producer = producerBuilder.Build();
             _topic = topic ?? throw new ArgumentNullException(nameof(topic));
             _maxRetryCount = maxRetryCount;
             _commitPeriod = commitPeriod;
+            _retryConsumerTimer = new Timer(async _ => await ConsumeRetryMessages(), null,
+                TimeSpan.FromMinutes(15), TimeSpan.FromMinutes(15));
         }
 
-        protected override Task ExecuteAsync(CancellationToken stoppingToken)
+        private async Task ConsumeRetryMessages()
         {
-            Task.Factory.StartNew(async () => await Run(stoppingToken),
-                stoppingToken, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            try
+            {
+                if (_cancellationToken.IsCancellationRequested)
+                {
+                    if (_retryConsumer == null)
+                    {
+                        return;
+                    }
+
+                    await _retryConsumerTimer.DisposeAsync();
+
+                    return;
+                }
+
+                var retryTopic = _topic + ".retry";
+                
+                _retryConsumer.Subscribe(retryTopic);
+
+                while (true)
+                {
+                    var result = _retryConsumer.Consume(TimeSpan.FromSeconds(3));
+
+                    if (result == null)
+                    {
+                        break;
+                    }
+
+                    if (result.Message == null)
+                    {
+                        continue;
+                    }
+                
+                    result.Message.IncrementHeaderValueAsInt(RetryCountHeaderKey);
+
+                    try
+                    {
+                        await OnConsume(result.Message);
+                    }
+                    catch (Exception e)
+                    {
+                        await OnError(e);
+                    
+                        var retryCount = result.Message.GetHeaderValue<int>(RetryCountHeaderKey);
+
+                        if (retryCount > _maxRetryCount)
+                        {
+                            var failedTopic = _topic + ".failed";
+
+                            await _producer.ProduceAsync(failedTopic, result.Message, _cancellationToken);
+                        }
+                        else
+                        {
+                            await _producer.ProduceAsync(retryTopic, result.Message, _cancellationToken);
+                        }
+                    }
+
+                    if (result.Offset % _commitPeriod == 0)
+                    {
+                        _retryConsumer.Commit(result);
+                    }
+                }
+            }
+            catch (OperationCanceledException)
+            {
+            }
+            catch (ObjectDisposedException)
+            {
+            }
+            catch (AccessViolationException)
+            {
+            }
+            catch (Exception e)
+            {
+                await OnError(e);
+            }
+        }
+
+        protected override Task ExecuteAsync(CancellationToken token)
+        {
+            _cancellationToken = token;
+
+            Task.Factory.StartNew(async () => await RunMainConsumer(token),
+                token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
             return Task.CompletedTask;
         }
 
-        private async Task Run(CancellationToken token)
+        private async Task RunMainConsumer(CancellationToken token)
         {
-            RETRY:
+            TRY_AGAIN:
 
             try
             {
@@ -75,38 +164,24 @@ namespace Confluent.Kafka.Lib.Core.Consumers
                     {
                         var result = _consumer.Consume(token);
 
-                        _consumer.Consume(TimeSpan.FromSeconds(3));
+                        _consumer.Consume(token);
 
-                        if (result?.Message == null)
+                        if (result.Message == null)
                         {
                             continue;
                         }
 
-                        result.Message.IncrementHeaderValueAsInt(RetryCountHeaderKey);
-
                         try
                         {
-                            await OnConsume(result);
+                            await OnConsume(result.Message);
                         }
                         catch (Exception e)
                         {
                             await OnError(e);
-                            
-                            var currentRetryCount = result.Message.GetHeaderValue<int>(RetryCountHeaderKey);
 
-                            if (currentRetryCount > _maxRetryCount)
-                            {
-                                var errorTopic = _topic + ".error";
+                            var retryTopic = _topic + ".retry";
 
-                                await _producer.ProduceAsync(errorTopic, result.Message, token);
-                            }
-                            else
-                            {
-#pragma warning disable 4014 // Don't await, it will fire after 15 minutes
-                                Task.Delay(TimeSpan.FromMinutes(15), token)
-                                    .ContinueWith(_ => _producer.Produce(_topic, result.Message), token);
-#pragma warning restore 4014
-                            }
+                            await _producer.ProduceAsync(retryTopic, result.Message, token);
                         }
 
                         if (result.Offset % _commitPeriod == 0)
@@ -142,11 +217,11 @@ namespace Confluent.Kafka.Lib.Core.Consumers
 
                 await Task.Delay(50, token);
 
-                goto RETRY;
+                goto TRY_AGAIN;
             }
         }
 
-        protected abstract Task OnConsume(ConsumeResult<string, string> consumeResult);
+        protected abstract Task OnConsume(Message<string, string> message);
         protected abstract Task OnError(Exception exception);
 
         public override void Dispose()
@@ -158,7 +233,9 @@ namespace Confluent.Kafka.Lib.Core.Consumers
 
             _disposed = true;
             _consumer?.Close();
+            _retryConsumer?.Close();
             _producer?.Dispose();
+            _retryConsumerTimer?.Dispose();
             base.Dispose();
         }
     }

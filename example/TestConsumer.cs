@@ -14,11 +14,9 @@ namespace Confluent.Kafka.Lib.Example
             _logger = logger;
         }
 
-        protected override Task OnConsume(ConsumeResult<string, string> consumeResult)
+        protected override Task OnConsume(Message<string, string> message)
         {
-            var key = consumeResult.Message.Key;
-            var value = consumeResult.Message.Value;
-            _logger.LogInformation($"Key : {key}, Value : {value}");
+            _logger.LogInformation($"Key : {message.Key}, Value : {message.Value}");
             
             return Task.CompletedTask;
         }
