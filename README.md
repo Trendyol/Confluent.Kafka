@@ -58,5 +58,7 @@ public class TestConsumer : KafkaConsumer
     }
 ```
 
+Update, appveyor added.
+
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
