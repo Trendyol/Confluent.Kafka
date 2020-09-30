@@ -3,7 +3,10 @@
 This is a wrapper repository around Confluent .NET library to make clients use Kafka more conveniently.
 
 * Provides retry support.
-* Produces failed messages to error topic.
+* Produces messages that could not be process to "your-topic.retry" topic.
+* Produces failed messages to "your-topic.failed" topic.
+* Uses multiple consumers for main consumer and retry consumer.
+* Provides periodic runs through retry topic and reprocessing them.
 * Can set commit period from `AddKafkaConsumer()` extension method.
 * Can set maximum retry count from `AddKafkaConsumer()` extension method.
 
@@ -37,11 +40,9 @@ public class TestConsumer : KafkaConsumer
             _logger = logger;
         }
 
-        protected override Task OnConsume(ConsumeResult<string, string> consumeResult)
+        protected override Task OnConsume(Message<string, string> message)
         {
-            var key = consumeResult.Message.Key;
-            var value = consumeResult.Message.Value;
-            _logger.LogInformation($"Key : {key}, Value : {value}");
+            _logger.LogInformation($"Key : {message.Key}, Value : {message.Value}");
             
             return Task.CompletedTask;
         }
