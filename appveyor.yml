@@ -5,7 +5,7 @@
       - master
   configuration: Release
   before_build:
-    - ps: nuget restore .\Confluent.Kafka.Lib.slnc
+    - ps: nuget restore .\Confluent.Kafka.Lib.sln
   build:
     project: .\Confluent.Kafka.Lib.sln
 # configuration for all other branches except "master"
