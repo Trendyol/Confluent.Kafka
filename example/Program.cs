@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -9,15 +10,13 @@ namespace Confluent.Kafka.Lib.Example
 {
     public static class Program
     {
-        public static IConfiguration Configuration { get; set; }
-        
         public static void Main(string[] args)
         {
             IConfigurationBuilder builder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json");
 
-            Configuration = builder.Build();
+            var configuration = builder.Build();
 
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
@@ -28,36 +27,44 @@ namespace Confluent.Kafka.Lib.Example
                             l.AddConsole();
                             l.SetMinimumLevel(LogLevel.Information);
                         })
-                        .ConfigureAppConfiguration(
-                            (context, builder) =>
-                            {
-                                string environment = context.HostingEnvironment?.EnvironmentName?.ToLowerInvariant();
-                                if (!string.IsNullOrWhiteSpace(environment))
-                                {
-                                    if (environment == "development")
-                                        return;
+                        .ConfigureAppConfiguration(ConfigureApplication);
 
-                                    string environmentFileName = $"nlog.{environment}.config";
-
-                                    if (!File.Exists(environmentFileName))
-                                        return;
-
-                                    if (File.Exists("nlog.config"))
-                                    {
-                                        File.Delete("nlog.config");
-                                    }
-
-                                    File.Move(environmentFileName, "nlog.config");
-                                }
-                            });
-
-                    webBuilder.UseConfiguration(Configuration);
+                    webBuilder.UseConfiguration(configuration);
                     webBuilder.UseStartup<Startup>();
                     webBuilder.UseNLog();
                     webBuilder.UseKestrel();
                 })
                 .Build()
                 .Run();
+        }
+
+        private static void ConfigureApplication(
+            WebHostBuilderContext context,
+            IConfigurationBuilder builder)
+        {
+            string environment = context
+                .HostingEnvironment
+                .EnvironmentName
+                .ToLowerInvariant();
+
+            if (environment == "development")
+            {
+                return;
+            }
+
+            string environmentFileName = $"nlog.{environment}.config";
+
+            if (!File.Exists(environmentFileName))
+            {
+                return;
+            }
+
+            if (File.Exists("nlog.config"))
+            {
+                File.Delete("nlog.config");
+            }
+
+            File.Move(environmentFileName, "nlog.config");
         }
     }
 }

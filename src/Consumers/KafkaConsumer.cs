@@ -11,14 +11,14 @@ namespace Confluent.Kafka.Lib.Core.Consumers
     public abstract class KafkaConsumer : BackgroundService
     {
         private bool _disposed;
-        private string _topic;
-        private IConsumer<string, string> _consumer;
-        private IConsumer<string, string> _retryConsumer;
-        private IProducer<string, string> _producer;
+        private string? _topic;
         private int _commitPeriod;
         private int _maxRetryCount;
-        private Timer _retryConsumerTimer;
         private CancellationToken _cancellationToken;
+        private IConsumer<string, string>? _consumer;
+        private IProducer<string, string>? _producer;
+        private Timer? _retryConsumerTimer;
+        private ConsumerConfig? _consumerConfig;
         
         private void SetFields(ConsumerConfig consumerConfig,
             ProducerConfig producerConfig,
@@ -48,42 +48,42 @@ namespace Confluent.Kafka.Lib.Core.Consumers
             }
 
             var consumerBuilder = new ConsumerBuilder<string, string>(consumerConfig);
-            var retryConsumerBuilder = new ConsumerBuilder<string, string>(consumerConfig);
             var producerBuilder = new ProducerBuilder<string, string>(producerConfig);
-
+            
             _consumer = consumerBuilder.Build();
-            _retryConsumer = retryConsumerBuilder.Build();
             _producer = producerBuilder.Build();
             _topic = topic ?? throw new ArgumentNullException(nameof(topic));
             _maxRetryCount = maxRetryCount;
             _commitPeriod = commitPeriod;
+            _consumerConfig = consumerConfig;
             _retryConsumerTimer = new Timer(async _ => await ConsumeRetryMessages(), null,
                 TimeSpan.FromMinutes(15), TimeSpan.FromMinutes(15));
         }
 
         private async Task ConsumeRetryMessages()
         {
+            if (_consumer == null ||
+                _producer == null ||
+                _retryConsumerTimer == null)
+            {
+                // This can only happen if initialization
+                // takes longer than 15 minutes which is very unlikely
+                // Added this check to suppress CS8618 warning
+                throw new InvalidOperationException();
+            }
+            
+            using var retryConsumer = new ConsumerBuilder<string, string>(_consumerConfig)
+                .Build();
+            
             try
             {
-                if (_cancellationToken.IsCancellationRequested)
-                {
-                    if (_retryConsumer == null)
-                    {
-                        return;
-                    }
-
-                    await _retryConsumerTimer.DisposeAsync();
-
-                    return;
-                }
-
                 var retryTopic = _topic + ".retry";
                 
-                _retryConsumer.Subscribe(retryTopic);
+                retryConsumer.Subscribe(retryTopic);
 
-                while (true)
+                while (_cancellationToken.IsCancellationRequested)
                 {
-                    var result = _retryConsumer.Consume(TimeSpan.FromSeconds(3));
+                    var result = retryConsumer.Consume(TimeSpan.FromSeconds(3));
 
                     if (result == null)
                     {
@@ -121,7 +121,7 @@ namespace Confluent.Kafka.Lib.Core.Consumers
 
                     if (result.Offset % _commitPeriod == 0)
                     {
-                        _retryConsumer.Commit(result);
+                        retryConsumer.Commit(result);
                     }
                 }
             }
@@ -152,6 +152,12 @@ namespace Confluent.Kafka.Lib.Core.Consumers
 
         private async Task RunMainConsumer(CancellationToken token)
         {
+            if (_consumer == null ||
+                _producer == null)
+            {
+                throw new InvalidOperationException();
+            }
+            
             TRY_AGAIN:
 
             try
@@ -233,7 +239,6 @@ namespace Confluent.Kafka.Lib.Core.Consumers
 
             _disposed = true;
             _consumer?.Close();
-            _retryConsumer?.Close();
             _producer?.Dispose();
             _retryConsumerTimer?.Dispose();
             base.Dispose();
