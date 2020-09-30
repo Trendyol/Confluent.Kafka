@@ -16,7 +16,7 @@ namespace Confluent.Kafka.Lib.Core.Extensions
             services.AddKafkaConsumer<T>(topic, 
                 bootstrapServers,
                 groupId,
-                5,
+                1,
                 3);
         }
         
@@ -70,8 +70,7 @@ namespace Confluent.Kafka.Lib.Core.Extensions
             };
             var producerConfig = new ProducerConfig
             {
-                BootstrapServers = bootstrapServers,
-                Acks = Acks.Leader
+                BootstrapServers = bootstrapServers
             };
             
             services.AddKafkaConsumer<T>(topic, 

@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -12,6 +14,12 @@ namespace Confluent.Kafka.Lib.Example
     {
         public static void Main(string[] args)
         {
+            Task.Delay(TimeSpan.FromSeconds(5))
+                .ContinueWith(async _ =>
+                {
+                    await ContinuationAction(_);
+                });
+            
             IConfigurationBuilder builder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json");
@@ -22,12 +30,11 @@ namespace Confluent.Kafka.Lib.Example
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.ConfigureLogging(l =>
-                        {
-                            l.ClearProviders();
-                            l.AddConsole();
-                            l.SetMinimumLevel(LogLevel.Information);
-                        })
-                        .ConfigureAppConfiguration(ConfigureApplication);
+                    {
+                        l.ClearProviders();
+                        l.AddConsole();
+                        l.SetMinimumLevel(LogLevel.Information);
+                    });
 
                     webBuilder.UseConfiguration(configuration);
                     webBuilder.UseStartup<Startup>();
@@ -38,33 +45,28 @@ namespace Confluent.Kafka.Lib.Example
                 .Run();
         }
 
-        private static void ConfigureApplication(
-            WebHostBuilderContext context,
-            IConfigurationBuilder builder)
+        private static async Task ContinuationAction(Task obj)
         {
-            string environment = context
-                .HostingEnvironment
-                .EnvironmentName
-                .ToLowerInvariant();
-
-            if (environment == "development")
+            var config = new ProducerConfig
             {
-                return;
+                BootstrapServers = "10.10.36.211:9092"
+            };
+            var producerBuilder = new ProducerBuilder<string, string>(config);
+            
+            var producer = producerBuilder.Build();
+            
+            for (int i = 0; i < 10000000; i++)
+            {
+                await producer.ProduceAsync("dogac-test-topic", new Message<string, string>
+                {
+                    Key = "key" + i % 10,
+                    Value = "value" + i % 10
+                });
+
+                await Task.Delay(200);
             }
 
-            string environmentFileName = $"nlog.{environment}.config";
-
-            if (!File.Exists(environmentFileName))
-            {
-                return;
-            }
-
-            if (File.Exists("nlog.config"))
-            {
-                File.Delete("nlog.config");
-            }
-
-            File.Move(environmentFileName, "nlog.config");
+            ;
         }
     }
 }
