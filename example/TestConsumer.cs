@@ -7,23 +7,16 @@ namespace Confluent.Kafka.Lib.Example
 {
     public class TestConsumer : KafkaConsumer
     {
-        private readonly ILogger<TestConsumer> _logger;
-
-        public TestConsumer(ILogger<TestConsumer> logger)
-        {
-            _logger = logger;
-        }
-
         protected override Task OnConsume(Message<string, string> message)
         {
-            _logger.LogInformation($"Key : {message.Key}, Value : {message.Value}");
+            Console.WriteLine($"Key : {message.Key}, Value : {message.Value}");
             
             return Task.CompletedTask;
         }
 
         protected override Task OnError(Exception exception)
         {
-            _logger.LogError(exception.ToString());
+            Console.WriteLine(exception.ToString());
             
             return Task.CompletedTask;
         }

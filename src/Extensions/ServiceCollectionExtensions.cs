@@ -8,6 +8,12 @@ namespace Confluent.Kafka.Lib.Core.Extensions
 {
     public static class ServiceCollectionExtensions
     {
+        // TODO: Remove overloaded methods, because they can
+        // cause a lot of confusion and caller may want
+        // to specify a different configuration than given methods
+        // and we cannot overload for every other configuration
+        // This can be prevented multiple ways:
+        // builder, default parameters, custom config class
         public static void AddKafkaConsumer<T>(this IServiceCollection services,
             string topic,
             string bootstrapServers,

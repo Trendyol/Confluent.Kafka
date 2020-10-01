@@ -11,8 +11,8 @@ namespace Confluent.Kafka.Lib.Example
             services.AddHealthChecks();
             
             services.AddKafkaConsumer<TestConsumer>(
-                "test-bootstrap-servers",
                 "test-topic",
+                "test-bootstrap-servers",
                 "test-group-id");
         }
 
