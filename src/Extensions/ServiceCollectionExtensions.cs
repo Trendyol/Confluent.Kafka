@@ -70,7 +70,7 @@ namespace Confluent.Kafka.Lib.Core.Extensions
             var consumerConfig = new ConsumerConfig
             {
                 BootstrapServers = bootstrapServers,
-                AutoOffsetReset = AutoOffsetReset.Earliest,
+                AutoOffsetReset = AutoOffsetReset.Earliest, // TODO: This should be configurable
                 EnableAutoCommit = false,
                 GroupId = groupId
             };
