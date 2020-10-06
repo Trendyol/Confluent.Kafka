@@ -1,5 +1,7 @@
+using System;
 using System.Linq;
 using System.Reflection;
+using Confluent.Kafka.Lib.Core.Configuration;
 using Confluent.Kafka.Lib.Core.Consumers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -8,36 +10,16 @@ namespace Confluent.Kafka.Lib.Core.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        // TODO: Remove overloaded methods, because they can
-        // cause a lot of confusion and caller may want
-        // to specify a different configuration than given methods
-        // and we cannot overload for every other configuration
-        // This can be prevented multiple ways:
-        // builder, default parameters, custom config class
         public static void AddKafkaConsumer<T>(this IServiceCollection services,
-            string topic,
-            string bootstrapServers,
-            string groupId) where T : KafkaConsumer
-        {
-            services.AddKafkaConsumer<T>(topic, 
-                bootstrapServers,
-                groupId,
-                1,
-                3);
-        }
-        
-        public static void AddKafkaConsumer<T>(this IServiceCollection services,
-            string topic,
-            ConsumerConfig consumerConfig,
-            ProducerConfig producerConfig,
-            int commitPeriod,
-            int maxRetryCount) where T : KafkaConsumer
+            KafkaConfig config) where T : KafkaConsumer
         {
             var ctor = typeof(T)
                 .GetConstructors()
                 .First();
-            var parameterTypes = ctor.GetParameters()
-                .Select(p => p.ParameterType);
+            var parameterTypes = ctor
+                .GetParameters()
+                .Select(p => p.ParameterType)
+                .ToList();
 
             services.AddTransient<IHostedService, T>(p =>
             {
@@ -45,45 +27,21 @@ namespace Confluent.Kafka.Lib.Core.Extensions
                     .Select(t => p.GetRequiredService(t))
                     .ToArray();
                 var instance = ctor.Invoke(parameters);
-                var setFieldsMethod = typeof(KafkaConsumer)
+                var setFields = typeof(KafkaConsumer)
                     .GetMethods(BindingFlags.Instance | BindingFlags.NonPublic)
                     .FirstOrDefault(m => m.Name == "SetFields");
-                setFieldsMethod?.Invoke(instance, new object[]
+                if (setFields == null)
                 {
-                    consumerConfig,
-                    producerConfig,
-                    topic,
-                    commitPeriod,
-                    maxRetryCount
+                    throw new Exception("A private SetFields method must exist to set configuration.");
+                }
+                
+                setFields.Invoke(instance, new object?[]
+                {
+                    config
                 });
+
                 return (T) instance;
             });
-        }
-        
-        public static void AddKafkaConsumer<T>(this IServiceCollection services,
-            string topic,
-            string bootstrapServers,
-            string groupId,
-            int commitPeriod,
-            int maxRetryCount) where T : KafkaConsumer
-        {
-            var consumerConfig = new ConsumerConfig
-            {
-                BootstrapServers = bootstrapServers,
-                AutoOffsetReset = AutoOffsetReset.Earliest, // TODO: This should be configurable
-                EnableAutoCommit = false,
-                GroupId = groupId
-            };
-            var producerConfig = new ProducerConfig
-            {
-                BootstrapServers = bootstrapServers
-            };
-            
-            services.AddKafkaConsumer<T>(topic, 
-                consumerConfig,
-                producerConfig,
-                commitPeriod,
-                maxRetryCount);
         }
     }
 }
