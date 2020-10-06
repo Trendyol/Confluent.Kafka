@@ -9,11 +9,6 @@
 
     <ItemGroup>
         <PackageReference Include="Confluent.Kafka" Version="1.5.0" />
-        <PackageReference Include="Microsoft.AspNetCore" Version="2.2.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Diagnostics.HealthChecks" Version="2.2.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.2.7" />
-        <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.2.0" />
-
         <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="3.1.7" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.7" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.7" />
