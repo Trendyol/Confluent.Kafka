@@ -7,14 +7,11 @@ namespace Confluent.Kafka.Lib.Core.Extensions
     internal static class MessageExtensions
     {
         /// <summary>
-        /// Increments header value, assuming the header value is
-        /// re-interpreted as Int32
+        /// Increments header value, assuming the header value is interpreted as Int32
         /// </summary>
-        /// <param name="message"></param>
-        /// <param name="key"></param>
-        public static void IncrementHeaderValueAsInt(this Message<string, string> message, string key)
+        public static void IncrementHeaderValue<TKey, TValue>(this Message<TKey, TValue> message, string key)
         {
-            var value = GetHeaderValue<int>(message, key);
+            var value = GetHeaderValue(message, key);
             
             SetHeaderValue(message, key, value + 1);
         }
@@ -22,12 +19,7 @@ namespace Confluent.Kafka.Lib.Core.Extensions
         /// <summary>
         /// Find header and re-interpret its value as T and return it.
         /// </summary>
-        /// <param name="message"></param>
-        /// <param name="key"></param>
-        /// <typeparam name="T">The type that message value will be interpreted as.</typeparam>
-        /// <returns>Message value as T</returns>
-        /// <exception cref="ArgumentNullException"></exception>
-        public static T GetHeaderValue<T>(this Message<string, string> message, string key) where T : unmanaged
+        public static int GetHeaderValue<TKey, TValue>(this Message<TKey, TValue> message, string key)
         {
             if (message == null)
             {
@@ -44,7 +36,7 @@ namespace Confluent.Kafka.Lib.Core.Extensions
                 {
                     var bytes = header.GetValueBytes();
 
-                    return Unsafe.As<byte, T>(ref bytes[0]);
+                    return Unsafe.As<byte, int>(ref bytes[0]);
                 }
             }
 
@@ -54,12 +46,7 @@ namespace Confluent.Kafka.Lib.Core.Extensions
         /// <summary>
         /// Set the header value of given key to value
         /// </summary>
-        /// <param name="message"></param>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
-        /// <typeparam name="T"></typeparam>
-        /// <exception cref="ArgumentNullException"></exception>
-        public static void SetHeaderValue<T>(this Message<string, string> message, string key, T value) where T : unmanaged
+        public static void SetHeaderValue<TKey, TValue>(this Message<TKey, TValue> message, string key, int value)
         {
             if (message == null)
             {
@@ -73,9 +60,9 @@ namespace Confluent.Kafka.Lib.Core.Extensions
             
             message.Headers.Remove(key);
 
-            var bytes = new byte[Unsafe.SizeOf<T>()];
+            var bytes = new byte[Unsafe.SizeOf<int>()];
 
-            Unsafe.As<byte, T>(ref bytes[0]) = value;
+            Unsafe.As<byte, int>(ref bytes[0]) = value;
 
             message.Headers.Add(key, bytes);
         }

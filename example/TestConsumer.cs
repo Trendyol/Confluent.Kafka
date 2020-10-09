@@ -1,22 +1,21 @@
 using System;
 using System.Threading.Tasks;
 using Confluent.Kafka.Lib.Core.Consumers;
-using Microsoft.Extensions.Logging;
 
 namespace Confluent.Kafka.Lib.Example
 {
-    public class TestConsumer : KafkaConsumer
+    public class TestConsumer : KafkaConsumer<Ignore, Event>
     {
-        protected override Task OnConsume(Message<string, string> message)
+        protected override Task OnConsume(Message<Ignore, Event> message)
         {
-            Console.WriteLine($"Key : {message.Key}, Value : {message.Value}");
+            Console.WriteLine($"Key: {message.Key}, Value : {message.Value}");
             
             return Task.CompletedTask;
         }
 
         protected override Task OnError(Exception exception)
         {
-            Console.WriteLine(exception.ToString());
+            Console.WriteLine(exception);
             
             return Task.CompletedTask;
         }

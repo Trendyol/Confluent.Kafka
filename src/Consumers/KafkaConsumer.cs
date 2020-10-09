@@ -3,15 +3,20 @@ using System.Threading;
 using System.Threading.Tasks;
 using Confluent.Kafka.Lib.Core.Configuration;
 using Confluent.Kafka.Lib.Core.Extensions;
+using Confluent.Kafka.Lib.Core.Serialization;
 using Microsoft.Extensions.Hosting;
 using static Confluent.Kafka.Lib.Core.Global.Constants;
 
 namespace Confluent.Kafka.Lib.Core.Consumers
 {
-    public abstract class KafkaConsumer : BackgroundService
+    public abstract class KafkaConsumer<TKey, TValue> : BackgroundService
     {
         private KafkaConfig? _config;
         private CancellationToken _cancellationToken;
+        private GenericSerializer<TKey> _keySerializer = new GenericSerializer<TKey>();
+        private GenericSerializer<TValue> _valueSerializer = new GenericSerializer<TValue>();
+        private GenericDeserializer<TKey> _keyDeserializer = new GenericDeserializer<TKey>();
+        private GenericDeserializer<TValue> _valueDeserializer = new GenericDeserializer<TValue>();
 
         /// <summary>
         /// Do not remove, this method gets called via reflection.
@@ -109,9 +114,13 @@ namespace Confluent.Kafka.Lib.Core.Consumers
                 throw new InvalidOperationException("Config cannot be null.");
             }
             
-            using var consumer = new ConsumerBuilder<string, string>(_config.MainConsumerConfig)
+            using var consumer = new ConsumerBuilder<TKey, TValue>(_config.MainConsumerConfig)
+                .SetKeyDeserializer(_keyDeserializer)
+                .SetValueDeserializer(_valueDeserializer)
                 .Build();
-            using var producer = new ProducerBuilder<string, string>(_config.RetryProducerConfig)
+            using var producer = new ProducerBuilder<TKey, TValue>(_config.RetryProducerConfig)
+                .SetKeySerializer(_keySerializer)
+                .SetValueSerializer(_valueSerializer)
                 .Build();
 
             while (true)
@@ -202,9 +211,13 @@ namespace Confluent.Kafka.Lib.Core.Consumers
             
             // Create a new consumer and producer locally, by doing this
             // we don't have to introduce another field like _retryConsumer
-            using var consumer = new ConsumerBuilder<string, string>(_config.RetryConsumerConfig)
+            using var consumer = new ConsumerBuilder<TKey, TValue>(_config.RetryConsumerConfig)
+                .SetKeyDeserializer(_keyDeserializer)
+                .SetValueDeserializer(_valueDeserializer)
                 .Build();
-            using var producer = new ProducerBuilder<string, string>(_config.RetryProducerConfig)
+            using var producer = new ProducerBuilder<TKey, TValue>(_config.RetryProducerConfig)
+                .SetKeySerializer(_keySerializer)
+                .SetValueSerializer(_valueSerializer)
                 .Build();
 
             do
@@ -242,7 +255,7 @@ namespace Confluent.Kafka.Lib.Core.Consumers
                         // Increment before we process the message
                         // because we are always going to try to process the message
                         // whether it is processed or not
-                        result.Message.IncrementHeaderValueAsInt(RetryCountHeaderKey);
+                        result.Message.IncrementHeaderValue(RetryCountHeaderKey);
 
                         try
                         {
@@ -252,7 +265,7 @@ namespace Confluent.Kafka.Lib.Core.Consumers
                         {
                             await OnError(e);
 
-                            var retryCount = result.Message.GetHeaderValue<int>(RetryCountHeaderKey);
+                            var retryCount = result.Message.GetHeaderValue(RetryCountHeaderKey);
 
                             if (retryCount > _config.MaxRetryCount)
                             {
@@ -310,7 +323,7 @@ namespace Confluent.Kafka.Lib.Core.Consumers
         /// </summary>
         /// <param name="message">Message that has been processed.</param>
         /// <returns>Task that represents this operation</returns>
-        protected abstract Task OnConsume(Message<string, string> message);
+        protected abstract Task OnConsume(Message<TKey, TValue> message);
 
         /// <summary>
         /// Implementers of this method shouldn't try to implement kafka-level
