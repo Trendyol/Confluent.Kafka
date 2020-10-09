@@ -46,10 +46,10 @@ public void ConfigureServices(IServiceCollection services)
 }
 ```
 
-Creating a new `KafkaConsumer`:
+Creating a new `KafkaConsumer` for `(string, string)` messages:
 
 ``` cs
-public class TestConsumer : KafkaConsumer
+public class TestConsumer : KafkaConsumer<string, string>                   // Default is UTF8 Serialization
 {
     protected override Task OnConsume(Message<string, string> message)
     {
@@ -65,6 +65,36 @@ public class TestConsumer : KafkaConsumer
         
         return Task.CompletedTask;
     }
+}
+```
+
+Creating a new `KafkaConsumer` with custom types:
+
+``` cs
+public class TestConsumer : KafkaConsumer<Ignore, Event>                     // JSON serialization
+{
+    protected override Task OnConsume(Message<Ignore, Event> message)        // Ignore keys
+    {
+        Console.WriteLine($"Key : {message.Key}, Value : {message.Value}");  // .Value will print Event
+        
+        return Task.CompletedTask;
+    }
+
+    protected override Task OnError(Exception exception)
+    {
+        // Handle your errors which occurs in your OnConsume method
+        // No retry semantics for consumers is needed because it is handled in base KafkaConsumer
+        
+        return Task.CompletedTask;
+    }
+}
+
+class Event
+{
+    public int Id { get; set; }
+    public string? Name { get; set; }
+    
+    public override string ToString() => $"Id : { Id }, Name : { Name }";
 }
 ```
 
