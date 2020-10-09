@@ -2,6 +2,7 @@
 
 This is a wrapper repository around Confluent .NET library to make clients use Kafka more conveniently.
 
+* Supports generic types for message key and message value.
 * Provides retries with *at least once semantics*, your services should be idempotent.
 * Produces messages that could not be processed to your *RetryTopic* parameter.
 * Uses different consumers for main consumer and retry consumer.
