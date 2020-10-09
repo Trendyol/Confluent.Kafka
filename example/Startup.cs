@@ -22,18 +22,18 @@ namespace Confluent.Kafka.Lib.Example
                 {
                     GroupId = "dogac-consumer-group",
                     AutoOffsetReset = AutoOffsetReset.Earliest,
-                    BootstrapServers = "10.10.36.211:9092"
+                    BootstrapServers = "localhost:9092"
                 },
                 RetryConsumerConfig = new ConsumerConfig
                 {
                     GroupId = "dogac-consumer-group",
                     AutoOffsetReset = AutoOffsetReset.Earliest,
-                    BootstrapServers = "10.10.36.211:9092",
+                    BootstrapServers = "localhost:9092",
                 },
                 MaxRetryCount = 3,
                 RetryProducerConfig = new ProducerConfig
                 {
-                    BootstrapServers = "10.10.36.211:9092"
+                    BootstrapServers = "localhost:9092"
                 }
             });
         }
