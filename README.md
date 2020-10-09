@@ -39,7 +39,7 @@ public void ConfigureServices(IServiceCollection services)
             BootstrapServers = "localhost:9092",
         },
         MaxRetryCount = 3,                        // Maximum retry count for re-processing records.
-        RetryProducerConfig = new ProducerConfig  // Provides configuration for your producer that produces to main and retry topics
+        RetryProducerConfig = new ProducerConfig  // Provides configuration for your producer that produces to retry and failed topics
         {
             BootstrapServers = "localhost:9092"
         }                                         // Note that we didn't set commit period because by default consumer config enables auto-commit
