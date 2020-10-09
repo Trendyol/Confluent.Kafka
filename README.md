@@ -4,7 +4,7 @@ This is a wrapper repository around Confluent .NET library to make clients use K
 
 * Provides retries with *at least once semantics*, your services should be idempotent.
 * Produces messages that could not be processed to your *RetryTopic* parameter.
-* Uses different consumers in a single consumer group for main consumer and retry consumers.
+* Uses different consumers for main consumer and retry consumer.
 * Provides periodic runs every *RetryPeriod* timespan through records in retry topic and reprocessing them.
 * Produces failed messages (exceeded *MaxRetryCount* parameter) to your *FailedTopic* parameter.
 * If using manual commit, you can set commit period in your *KafkaConfig*.
