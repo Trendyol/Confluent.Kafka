@@ -10,4 +10,9 @@ namespace Confluent.Kafka.Lib.Example
             return $"Id : { Id }, Name : { Name }";
         }
     }
+
+    public class Event2
+    {
+        public int Id { get; set; }
+    }
 }
