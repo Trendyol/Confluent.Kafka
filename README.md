@@ -2,6 +2,7 @@
 
 This is a wrapper repository around Confluent .NET library to make clients use Kafka more conveniently.
 
+* Supports generic types for message key and message value.
 * Provides retries with *at least once semantics*, your services should be idempotent.
 * Produces messages that could not be processed to your *RetryTopic* parameter.
 * Uses different consumers for main consumer and retry consumer.
@@ -38,7 +39,7 @@ public void ConfigureServices(IServiceCollection services)
             BootstrapServers = "localhost:9092",
         },
         MaxRetryCount = 3,                        // Maximum retry count for re-processing records.
-        RetryProducerConfig = new ProducerConfig  // Provides configuration for your producer that produces to main and retry topics
+        RetryProducerConfig = new ProducerConfig  // Provides configuration for your producer that produces to retry and failed topics
         {
             BootstrapServers = "localhost:9092"
         }                                         // Note that we didn't set commit period because by default consumer config enables auto-commit
@@ -46,10 +47,10 @@ public void ConfigureServices(IServiceCollection services)
 }
 ```
 
-Creating a new `KafkaConsumer`:
+Creating a new `KafkaConsumer` for `(string, string)` messages:
 
 ``` cs
-public class TestConsumer : KafkaConsumer
+public class TestConsumer : KafkaConsumer<string, string>                   // Default is UTF8 Serialization
 {
     protected override Task OnConsume(Message<string, string> message)
     {
@@ -65,6 +66,36 @@ public class TestConsumer : KafkaConsumer
         
         return Task.CompletedTask;
     }
+}
+```
+
+Creating a new `KafkaConsumer` with custom types:
+
+``` cs
+public class TestConsumer : KafkaConsumer<Ignore, Event>                     // JSON serialization
+{
+    protected override Task OnConsume(Message<Ignore, Event> message)        // Ignore keys
+    {
+        Console.WriteLine($"Key : {message.Key}, Value : {message.Value}");  // .Value will print Event
+        
+        return Task.CompletedTask;
+    }
+
+    protected override Task OnError(Exception exception)
+    {
+        // Handle your errors which occurs in your OnConsume method
+        // No retry semantics for consumers is needed because it is handled in base KafkaConsumer
+        
+        return Task.CompletedTask;
+    }
+}
+
+class Event
+{
+    public int Id { get; set; }
+    public string? Name { get; set; }
+    
+    public override string ToString() => $"Id : { Id }, Name : { Name }";
 }
 ```
 
