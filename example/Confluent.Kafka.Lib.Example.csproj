@@ -9,15 +9,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Content Include="appsettings.json">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Content>
-    </ItemGroup>
-
-    <ItemGroup>
-        <PackageReference Include="Confluent.Kafka" Version="1.5.0" />
-    </ItemGroup>
-    <ItemGroup>
         <ProjectReference Include="..\src\Confluent.Kafka.Lib.Core.csproj" />
     </ItemGroup>
 </Project>
