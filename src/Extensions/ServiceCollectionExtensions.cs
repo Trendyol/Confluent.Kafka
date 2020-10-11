@@ -20,25 +20,22 @@ namespace Confluent.Kafka.Lib.Core.Extensions
                 .Select(p => p.ParameterType)
                 .ToList();
 
-            var f = typeof(T)
-                .GetRuntimeMethods();
-
             services.AddTransient<IHostedService, T>(p =>
             {
                 var parameters = parameterTypes
-                    .Select(t => p.GetRequiredService(t))
+                    .Select(p.GetRequiredService)
                     .ToArray();
                 var instance = ctor.Invoke(parameters);
-                var setFields = typeof(T)
+                var setConfig = typeof(T)
                     .BaseType
                     .GetMethods(BindingFlags.Instance | BindingFlags.NonPublic)
-                    .FirstOrDefault(m => m.Name == "SetFields");
-                if (setFields == null)
+                    .FirstOrDefault(m => m.Name == "SetConfiguration");
+                if (setConfig == null)
                 {
-                    throw new Exception("A private SetFields method must exist to set configuration.");
+                    throw new Exception("A private SetConfiguration method must exist to set configuration.");
                 }
                 
-                setFields.Invoke(instance, new object?[]
+                setConfig.Invoke(instance, new object?[]
                 {
                     config
                 });

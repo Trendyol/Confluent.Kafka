@@ -25,7 +25,7 @@ namespace Confluent.Kafka.Lib.Core.Consumers
         /// We have to both provide a parameterless constructor and a private
         /// set method for easier use of clients and do not break encapsulation.
         /// </summary>
-        private void SetFields(KafkaConfig config)
+        private void SetConfiguration(KafkaConfig config)
         {
             if (config == null)
             {
@@ -109,7 +109,7 @@ namespace Confluent.Kafka.Lib.Core.Consumers
             if (_config == null)
             {
                 // Technically config can never be null here because
-                // AddKafkaConsumer will always call SetFields method
+                // AddKafkaConsumer will always call SetConfiguration method
                 // before the HostedService is up
                 throw new InvalidOperationException("Config cannot be null.");
             }
@@ -190,10 +190,6 @@ namespace Confluent.Kafka.Lib.Core.Consumers
                     await OnError(e);
 
                     await Task.Delay(50, token);
-
-                    // goto is used to reduce nesting
-                    // You can look at Linux Developer Guidelines
-                    // if you are not a fan of goto
                 }
             }
         }
@@ -202,11 +198,9 @@ namespace Confluent.Kafka.Lib.Core.Consumers
         {
             // We just set config before calling this method
             // therefore it can never be null
-            // Added this check to suppress compilers warning
-            // It may be a bug in Roslyn
             if (_config == null)
             {
-                throw new InvalidOperationException("Config can never be null here.");
+                throw new InvalidOperationException("Config cannot be null.");
             }
             
             // Create a new consumer and producer locally, by doing this
