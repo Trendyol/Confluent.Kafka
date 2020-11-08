@@ -13,10 +13,10 @@ namespace Confluent.Kafka.Lib.Core.Consumers
     {
         private KafkaConfig? _config;
         private CancellationToken _cancellationToken;
-        private GenericSerializer<TKey> _keySerializer = new GenericSerializer<TKey>();
-        private GenericSerializer<TValue> _valueSerializer = new GenericSerializer<TValue>();
-        private GenericDeserializer<TKey> _keyDeserializer = new GenericDeserializer<TKey>();
-        private GenericDeserializer<TValue> _valueDeserializer = new GenericDeserializer<TValue>();
+        private readonly GenericSerializer<TKey> _keySerializer = new GenericSerializer<TKey>();
+        private readonly GenericSerializer<TValue> _valueSerializer = new GenericSerializer<TValue>();
+        private readonly GenericDeserializer<TKey> _keyDeserializer = new GenericDeserializer<TKey>();
+        private readonly GenericDeserializer<TValue> _valueDeserializer = new GenericDeserializer<TValue>();
 
         /// <summary>
         /// Do not remove, this method gets called via reflection.
