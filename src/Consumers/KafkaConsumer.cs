@@ -146,7 +146,7 @@ namespace Confluent.Kafka.Lib.Core.Consumers
                             }
                             catch (Exception e)
                             {
-                                await OnError(e);
+                                await OnError(e, result.Message);
 
                                 // TODO: Produce can throw
                                 await producer.ProduceAsync(_config.RetryTopic, result.Message, token);
@@ -162,14 +162,14 @@ namespace Confluent.Kafka.Lib.Core.Consumers
                                     }
                                     catch (KafkaException e)
                                     {
-                                        await OnError(e);
+                                        await OnError(e, result.Message);
                                     }
                                 }
                             }
                         }
                         catch (ConsumeException e)
                         {
-                            await OnError(e);
+                            await OnError(e, null);
                         }
                     }
                 }
@@ -187,7 +187,7 @@ namespace Confluent.Kafka.Lib.Core.Consumers
                 }
                 catch (Exception e)
                 {
-                    await OnError(e);
+                    await OnError(e, null);
 
                     await Task.Delay(50, token);
                 }
@@ -257,7 +257,7 @@ namespace Confluent.Kafka.Lib.Core.Consumers
                         }
                         catch (Exception e)
                         {
-                            await OnError(e);
+                            await OnError(e, result.Message);
 
                             var retryCount = result.Message.GetHeaderValue(RetryCountHeaderKey);
 
@@ -307,7 +307,7 @@ namespace Confluent.Kafka.Lib.Core.Consumers
                 }
                 catch (Exception e)
                 {
-                    await OnError(e);
+                    await OnError(e, null);
                 }
             } while (!_cancellationToken.IsCancellationRequested);
         }
@@ -326,6 +326,6 @@ namespace Confluent.Kafka.Lib.Core.Consumers
         /// </summary>
         /// <param name="exception"></param>
         /// <returns>Task that represents this operation</returns>
-        protected abstract Task OnError(Exception exception);
+        protected abstract Task OnError(Exception exception, Message<TKey, TValue>? message);
     }
 }

@@ -13,7 +13,7 @@ namespace Confluent.Kafka.Lib.Example
             return Task.CompletedTask;
         }
 
-        protected override Task OnError(Exception exception)
+        protected override Task OnError(Exception exception, Message<Ignore, Event>? message)
         {
             Console.WriteLine(exception);
             
