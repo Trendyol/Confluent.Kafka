@@ -11,6 +11,7 @@ namespace Confluent.Kafka.Lib.Core.Consumers
 {
     public abstract class KafkaConsumer<TKey, TValue> : BackgroundService
     {
+        private bool _started;
         private KafkaConfig? _config;
         private CancellationToken _cancellationToken;
         private readonly GenericSerializer<TKey> _keySerializer = new GenericSerializer<TKey>();
@@ -19,13 +20,13 @@ namespace Confluent.Kafka.Lib.Core.Consumers
         private readonly GenericDeserializer<TValue> _valueDeserializer = new GenericDeserializer<TValue>();
 
         /// <summary>
-        /// Do not remove, this method gets called via reflection.
+        /// This method gets called via reflection.
         /// This setup is made to support dependency injection and
         /// a parameterless constructor for KafkaConsumer.
-        /// We have to both provide a parameterless constructor and a private
-        /// set method for easier use of clients and do not break encapsulation.
+        /// We have to both provide a parameterless constructor and
+        /// a setter method for ease of use for clients.
         /// </summary>
-        private void SetConfiguration(KafkaConfig config)
+        public void SetConfiguration(KafkaConfig config)
         {
             if (config == null)
             {
@@ -90,16 +91,27 @@ namespace Confluent.Kafka.Lib.Core.Consumers
                 throw new AggregateException("RetryPeriod is required.");
             }
 
+            if (_started)
+            {
+                throw new InvalidOperationException("You cannot set configuration once consumer is started.");
+            }
+
             _config = config;
-            _ = StartRetryConsumerLoop();
         }
 
         protected override Task ExecuteAsync(CancellationToken token)
         {
+            if (_config == null)
+            {
+                throw new InvalidOperationException("You must set config before starting consumer.");
+            }
+            
             _cancellationToken = token;
-
+            _started = true;
+            
             Task.Factory.StartNew(async () => await StartMainConsumerLoop(token),
                 token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            _ = StartRetryConsumerLoop();
 
             return Task.CompletedTask;
         }

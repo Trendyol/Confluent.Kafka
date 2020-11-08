@@ -28,11 +28,12 @@ namespace Confluent.Kafka.Lib.Core.Extensions
                 var instance = ctor.Invoke(parameters);
                 var setConfig = typeof(T)
                     .BaseType
-                    .GetMethods(BindingFlags.Instance | BindingFlags.NonPublic)
+                    .GetMethods(BindingFlags.Instance | BindingFlags.Public)
                     .FirstOrDefault(m => m.Name == "SetConfiguration");
+                
                 if (setConfig == null)
                 {
-                    throw new Exception("A private SetConfiguration method must exist to set configuration.");
+                    throw new Exception("A public SetConfiguration method must exist to set configuration.");
                 }
                 
                 setConfig.Invoke(instance, new object?[]
