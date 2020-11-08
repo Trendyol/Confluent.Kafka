@@ -27,9 +27,7 @@ namespace Confluent.Kafka.Lib.Core.Serialization
                     return null;
             }
 
-            var serialized = JsonSerializer.Serialize(data);
-
-            return Encoding.UTF8.GetBytes(serialized);
+            return JsonSerializer.SerializeToUtf8Bytes(data);
         }
     }
 }
