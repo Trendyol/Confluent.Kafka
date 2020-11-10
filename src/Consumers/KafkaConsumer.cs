@@ -307,13 +307,13 @@ namespace Confluent.Kafka.Lib.Core.Consumers
                 catch (OperationCanceledException)
                 {
                 }
+                // This can get thrown if the host is down but consumer is
+                // still trying to consume messages from a TopicPartition
                 catch (ObjectDisposedException)
                 {
                 }
-                // This can be sometimes called instead of ObjectDisposedException
-                // there are some issues that are open concerning this issue
-                // this can get thrown if the host is down but consumer is
-                // still trying to consume messages from a TopicPartition
+                // This can get thrown instead of ObjectDisposedException,
+                // there are some issues concerning this issue
                 catch (AccessViolationException)
                 {
                 }
