@@ -5,7 +5,9 @@ using Confluent.Kafka.Lib.Core.Configuration;
 using Confluent.Kafka.Lib.Core.Extensions;
 using Confluent.Kafka.Lib.Core.Serialization;
 using Microsoft.Extensions.Hosting;
-using static Confluent.Kafka.Lib.Core.Global.Constants;
+using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
+using static Confluent.Kafka.Lib.Core.Constants;
 
 namespace Confluent.Kafka.Lib.Core.Consumers
 {
@@ -28,6 +30,12 @@ namespace Confluent.Kafka.Lib.Core.Consumers
         /// </summary>
         public void SetConfiguration(KafkaConfig config)
         {
+            if (_started)
+            {
+                throw new InvalidOperationException("You cannot set configuration once consumer is started.");
+            }
+
+            // TODO (baris.ceviz): Move config rules to KafkaConfig class and use builder pattern for building kafka configs
             if (config == null)
             {
                 throw new ArgumentNullException("KafkaConfig cannot be null.");
@@ -91,11 +99,6 @@ namespace Confluent.Kafka.Lib.Core.Consumers
                 throw new AggregateException("RetryPeriod is required.");
             }
 
-            if (_started)
-            {
-                throw new InvalidOperationException("You cannot set configuration once consumer is started.");
-            }
-
             _config = config;
         }
 
@@ -105,12 +108,13 @@ namespace Confluent.Kafka.Lib.Core.Consumers
             {
                 throw new InvalidOperationException("You must set config before starting consumer.");
             }
-            
+
             _cancellationToken = token;
             _started = true;
-            
+
             Task.Factory.StartNew(async () => await StartMainConsumerLoop(token),
                 token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+
             _ = StartRetryConsumerLoop();
 
             return Task.CompletedTask;
@@ -125,11 +129,12 @@ namespace Confluent.Kafka.Lib.Core.Consumers
                 // before the HostedService is up
                 throw new InvalidOperationException("Config cannot be null.");
             }
-            
+
             using var consumer = new ConsumerBuilder<TKey, TValue>(_config.MainConsumerConfig)
                 .SetKeyDeserializer(_keyDeserializer)
                 .SetValueDeserializer(_valueDeserializer)
                 .Build();
+            
             using var producer = new ProducerBuilder<TKey, TValue>(_config.RetryProducerConfig)
                 .SetKeySerializer(_keySerializer)
                 .SetValueSerializer(_valueSerializer)
@@ -185,20 +190,23 @@ namespace Confluent.Kafka.Lib.Core.Consumers
                         }
                     }
                 }
-                catch (OperationCanceledException)
-                {
-                    break;
-                }
-                catch (ObjectDisposedException)
-                {
-                    break;
-                }
-                catch (AccessViolationException)
-                {
-                    break;
-                }
                 catch (Exception e)
                 {
+                    if (e is OperationCanceledException)
+                    {
+                        break;
+                    }
+
+                    if (e is ObjectDisposedException)
+                    {
+                        break;
+                    }
+
+                    if (e is AccessViolationException)
+                    {
+                        break;
+                    }
+
                     await OnError(e, null);
 
                     await Task.Delay(50, token);
@@ -214,7 +222,7 @@ namespace Confluent.Kafka.Lib.Core.Consumers
             {
                 throw new InvalidOperationException("Config cannot be null.");
             }
-            
+
             // Create a new consumer and producer locally, by doing this
             // we don't have to introduce another field like _retryConsumer
             using var consumer = new ConsumerBuilder<TKey, TValue>(_config.RetryConsumerConfig)

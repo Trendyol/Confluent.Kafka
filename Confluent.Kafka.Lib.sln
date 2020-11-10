@@ -6,6 +6,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Confluent.Kafka.Lib.Example
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Confluent.Kafka.Lib.Tests", "tests\Confluent.Kafka.Lib.Tests.csproj", "{7840F5D4-93E2-4FC2-94B3-0F2005FBBE75}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{7784A3B2-3211-441F-9373-5230CF862C4F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{EE9A3108-BCE0-4E63-9257-BA4577AA6DAC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +28,10 @@ Global
 		{7840F5D4-93E2-4FC2-94B3-0F2005FBBE75}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7840F5D4-93E2-4FC2-94B3-0F2005FBBE75}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7840F5D4-93E2-4FC2-94B3-0F2005FBBE75}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{F1A896A0-4568-4822-9FF6-14506EC95854} = {7784A3B2-3211-441F-9373-5230CF862C4F}
+		{B14698DD-23B2-493D-97D9-866F765239D7} = {EE9A3108-BCE0-4E63-9257-BA4577AA6DAC}
+		{7840F5D4-93E2-4FC2-94B3-0F2005FBBE75} = {EE9A3108-BCE0-4E63-9257-BA4577AA6DAC}
 	EndGlobalSection
 EndGlobal

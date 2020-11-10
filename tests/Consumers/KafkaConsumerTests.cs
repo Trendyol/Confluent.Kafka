@@ -11,7 +11,7 @@ namespace Confluent.Kafka.Lib.Tests.Consumers
         [Fact]
         public void ShouldCreateConsumer()
         {
-            var consumer = new TestConsumer();
+            _ = new TestConsumer();
         }
 
         [Fact]

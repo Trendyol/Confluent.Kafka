@@ -2,15 +2,18 @@ using System;
 using Confluent.Kafka.Lib.Core.Configuration;
 using Confluent.Kafka.Lib.Core.Extensions;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Confluent.Kafka.Lib.Example
 {
     public class Startup
     {
+        private IConfiguration _configuration;
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddHealthChecks();
+            services.Configure<KafkaConfig>(_configuration.GetSection("KafkaConfig"));
             
             services.AddKafkaConsumer<TestConsumer>(new KafkaConfig
             {

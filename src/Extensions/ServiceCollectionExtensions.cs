@@ -28,7 +28,7 @@ namespace Confluent.Kafka.Lib.Core.Extensions
                 var instance = ctor.Invoke(parameters);
                 var setConfig = typeof(T)
                     .BaseType
-                    .GetMethods(BindingFlags.Instance | BindingFlags.Public)
+                    ?.GetMethods(BindingFlags.Instance | BindingFlags.Public)
                     .FirstOrDefault(m => m.Name == "SetConfiguration");
                 
                 if (setConfig == null)

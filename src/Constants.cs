@@ -1,4 +1,4 @@
-namespace Confluent.Kafka.Lib.Core.Global
+namespace Confluent.Kafka.Lib.Core
 {
     internal static class Constants
     {
