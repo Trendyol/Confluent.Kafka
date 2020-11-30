@@ -1,10 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Confluent.Kafka.Lib.Core", "src\Confluent.Kafka.Lib.Core.csproj", "{F1A896A0-4568-4822-9FF6-14506EC95854}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Confluent.Kafka.Lib.Example", "example\Confluent.Kafka.Lib.Example.csproj", "{B14698DD-23B2-493D-97D9-866F765239D7}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Confluent.Kafka.Lib.Tests", "tests\Confluent.Kafka.Lib.Tests.csproj", "{7840F5D4-93E2-4FC2-94B3-0F2005FBBE75}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Confluent.Kafka.Lib.Core", "src\Confluent.Kafka.Lib.Core.csproj", "{2A495644-3F58-48E2-9103-DE977D520D08}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -12,17 +10,13 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{F1A896A0-4568-4822-9FF6-14506EC95854}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F1A896A0-4568-4822-9FF6-14506EC95854}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F1A896A0-4568-4822-9FF6-14506EC95854}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F1A896A0-4568-4822-9FF6-14506EC95854}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B14698DD-23B2-493D-97D9-866F765239D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B14698DD-23B2-493D-97D9-866F765239D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B14698DD-23B2-493D-97D9-866F765239D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B14698DD-23B2-493D-97D9-866F765239D7}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7840F5D4-93E2-4FC2-94B3-0F2005FBBE75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7840F5D4-93E2-4FC2-94B3-0F2005FBBE75}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7840F5D4-93E2-4FC2-94B3-0F2005FBBE75}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7840F5D4-93E2-4FC2-94B3-0F2005FBBE75}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A495644-3F58-48E2-9103-DE977D520D08}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A495644-3F58-48E2-9103-DE977D520D08}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A495644-3F58-48E2-9103-DE977D520D08}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A495644-3F58-48E2-9103-DE977D520D08}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
