@@ -20,7 +20,7 @@ namespace Confluent.Kafka.Utility.Tests.UnitTests
             _topic = _fixture.Create<string>();
             _mockConsumer = new Mock<IConsumer<string, string>>();
 
-            _sut = new TestConsumer(_topic, _mockConsumer.Object);
+            _sut = new UnitTestConsumer(_topic, _mockConsumer.Object);
         }
 
         [Test]

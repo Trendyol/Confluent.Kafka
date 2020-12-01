@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 
 namespace Confluent.Kafka.Utility.Tests.UnitTests
 {
-    public class TestConsumer : KafkaConsumer<string, string>
+    public class UnitTestConsumer : KafkaConsumer<string, string>
     {
-        public TestConsumer(string topic, IConsumer<string, string> consumer) : base(topic, consumer)
+        public UnitTestConsumer(string topic, IConsumer<string, string> consumer) : base(topic, consumer)
         {
         }
 
