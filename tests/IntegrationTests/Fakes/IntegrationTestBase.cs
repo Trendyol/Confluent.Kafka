@@ -1,14 +1,12 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
-using AutoFixture;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 
-namespace Confluent.Kafka.Lib.Tests.IntegrationTests.Fakes
+namespace Confluent.Kafka.Utility.Tests.IntegrationTests.Fakes
 {
     public class IntegrationTestBase
     {

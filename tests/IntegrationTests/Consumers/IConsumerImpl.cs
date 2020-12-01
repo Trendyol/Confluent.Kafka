@@ -1,7 +1,6 @@
 using System;
-using Confluent.Kafka.Lib.Core;
 
-namespace Confluent.Kafka.Lib.Tests.IntegrationTests.Consumers
+namespace Confluent.Kafka.Utility.Tests.IntegrationTests.Consumers
 {
     public interface IConsumerImpl : IKafkaConsumer, IDisposable
     {

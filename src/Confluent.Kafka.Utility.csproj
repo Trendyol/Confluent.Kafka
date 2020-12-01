@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
-        <RootNamespace>Confluent.Kafka.Lib.Core</RootNamespace>
+        <RootNamespace>Confluent.Kafka.Utility</RootNamespace>
         <LangVersion>latest</LangVersion>
         <Nullable>enable</Nullable>
     </PropertyGroup>

@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 
-namespace Confluent.Kafka.Lib.Tests.IntegrationTests.Producers
+namespace Confluent.Kafka.Utility.Tests.IntegrationTests.Producers
 {
     public class KafkaProducer : IKafkaProducer
     {

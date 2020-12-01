@@ -1,9 +1,9 @@
-﻿using Confluent.Kafka.Lib.Tests.IntegrationTests.Producers;
+﻿using Confluent.Kafka.Utility.Tests.IntegrationTests.Producers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Confluent.Kafka.Lib.Tests.IntegrationTests.Fakes
+namespace Confluent.Kafka.Utility.Tests.IntegrationTests.Fakes
 {
     public class TestStartup
     {

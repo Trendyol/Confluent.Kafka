@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Confluent.Kafka.Lib.Core
+namespace Confluent.Kafka.Utility
 {
     public interface IKafkaConsumer : IDisposable
     {

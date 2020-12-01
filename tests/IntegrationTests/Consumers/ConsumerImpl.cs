@@ -1,8 +1,7 @@
 using System;
 using System.Threading.Tasks;
-using Confluent.Kafka.Lib.Core;
 
-namespace Confluent.Kafka.Lib.Tests.IntegrationTests.Consumers
+namespace Confluent.Kafka.Utility.Tests.IntegrationTests.Consumers
 {
     public class ConsumerImpl<TKey, TValue> : KafkaConsumer<TKey, TValue>, IConsumerImpl
     {

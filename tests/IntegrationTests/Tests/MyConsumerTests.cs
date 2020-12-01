@@ -5,14 +5,14 @@ using System.Threading.Tasks;
 using AdminClient.Extensions;
 using AutoFixture;
 using Confluent.Kafka.Admin;
-using Confluent.Kafka.Lib.Tests.IntegrationTests.Consumers;
-using Confluent.Kafka.Lib.Tests.IntegrationTests.Fakes;
-using Confluent.Kafka.Lib.Tests.IntegrationTests.Producers;
+using Confluent.Kafka.Utility.Tests.IntegrationTests.Consumers;
+using Confluent.Kafka.Utility.Tests.IntegrationTests.Fakes;
+using Confluent.Kafka.Utility.Tests.IntegrationTests.Producers;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using NUnit.Framework;
 
-namespace Confluent.Kafka.Lib.Tests.IntegrationTests.Tests
+namespace Confluent.Kafka.Utility.Tests.IntegrationTests.Tests
 {
     public class MyConsumerTests : IntegrationTestBase
     {

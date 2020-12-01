@@ -1,8 +1,7 @@
 using System;
 using System.Threading.Tasks;
-using Confluent.Kafka.Lib.Core;
 
-namespace Confluent.Kafka.Lib.Tests.UnitTests
+namespace Confluent.Kafka.Utility.Tests.UnitTests
 {
     public class TestConsumer : KafkaConsumer<string, string>
     {

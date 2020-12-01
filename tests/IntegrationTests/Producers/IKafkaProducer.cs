@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace Confluent.Kafka.Lib.Tests.IntegrationTests.Producers
+namespace Confluent.Kafka.Utility.Tests.IntegrationTests.Producers
 {
     public interface IKafkaProducer
     {

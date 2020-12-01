@@ -1,11 +1,10 @@
 using System.Threading;
 using AutoFixture;
-using Confluent.Kafka.Lib.Core;
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 
-namespace Confluent.Kafka.Lib.Tests.UnitTests
+namespace Confluent.Kafka.Utility.Tests.UnitTests
 {
     public class KafkaConsumerTests
     {

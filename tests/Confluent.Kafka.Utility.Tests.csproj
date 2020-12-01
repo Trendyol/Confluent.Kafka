@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
-        <RootNamespace>Confluent.Kafka.Lib.Tests</RootNamespace>
+        <RootNamespace>Confluent.Kafka.Utility.Tests</RootNamespace>
         <LangVersion>latest</LangVersion>
     </PropertyGroup>
 
@@ -18,7 +18,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\src\Confluent.Kafka.Lib.Core.csproj" />
+      <ProjectReference Include="..\src\Confluent.Kafka.Utility.csproj" />
     </ItemGroup>
 
     <ItemGroup>
