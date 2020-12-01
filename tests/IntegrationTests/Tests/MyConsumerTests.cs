@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture;
@@ -16,12 +19,6 @@ namespace Confluent.Kafka.Utility.Tests.IntegrationTests.Tests
             await base.SetUp();
             
             _fixture = new Fixture();
-        }
-
-        [TearDown]
-        public override async Task TearDown()
-        {
-            await base.TearDown();
         }
 
         [Test]
@@ -161,6 +158,70 @@ namespace Confluent.Kafka.Utility.Tests.IntegrationTests.Tests
             await Task.Delay(1000);
 
             Assert.Pass();
+        }
+        
+        [Test]
+        public async Task RunAsync_WhenMultipleMessagesProduced_ShouldConsumeAllMessages()
+        {
+            var keys = _fixture.CreateMany<string>(5)
+                .ToList();
+            var values = _fixture.CreateMany<string>(5)
+                .ToList();
+
+            using var consumer = CreateConsumer<string, string>(Topic);
+            var cts = new CancellationTokenSource();
+            
+            await consumer.RunAsync(cts.Token);
+
+            await Task.Delay(500, cts.Token);
+            
+            var processedRecords = new List<ConsumeResult<string, string>>();
+
+            consumer.RecordProcessed += result =>
+            {
+                processedRecords.Add(result);
+                
+                if (processedRecords.Count == 5)
+                    cts.Cancel();
+            };
+            consumer.OnConsumeErrored += result =>
+            {
+                Assert.Fail();
+            };
+            consumer.OnCommitErrored += (e, result) =>
+            {
+                Assert.Fail();
+            };
+            consumer.OnProcessErrored += (e, result) =>
+            {
+                Assert.Fail();
+            };
+
+            for (var i = 0; i < keys.Count; i++)
+            {
+                var key = keys[i];
+                var value = values[i];
+                
+                await Producer.ProduceAsync(Topic, new Message<string, string>
+                {
+                    Key = key,
+                    Value = value
+                });
+            }
+
+            try
+            {
+                await Task.Delay(Timeout.Infinite, cts.Token);
+            }
+            catch (OperationCanceledException)
+            {
+            }
+
+            var keysProcessed = processedRecords.Select(r => r.Message.Key);
+            var valuesProcessed = processedRecords.Select(r => r.Message.Value);
+
+            keysProcessed.Should().BeEquivalentTo(keys);
+            valuesProcessed.Should().BeEquivalentTo(values);
         }
     }
 }

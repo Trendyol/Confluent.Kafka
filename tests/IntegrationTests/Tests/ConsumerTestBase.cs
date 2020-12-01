@@ -23,8 +23,8 @@ namespace Confluent.Kafka.Utility.Tests.IntegrationTests.Tests
         public virtual async Task SetUp()
         {
             Topic = Guid.NewGuid().ToString();
-            BootstrapServers = Configuration.GetValue<string>("BootstrapServers");
             Configuration = GetRequiredService<IConfiguration>();
+            BootstrapServers = Configuration.GetValue<string>("BootstrapServers");
             Producer = GetRequiredService<IKafkaProducer>();
             DefaultConfig = new ConsumerConfig
             {
@@ -53,6 +53,15 @@ namespace Confluent.Kafka.Utility.Tests.IntegrationTests.Tests
                 .Build();
             return new ConsumerImpl<TKey, TValue>(topic, consumer);
         }
+        
+        protected IProducer<TKey, TValue> CreateProducer<TKey, TValue>()
+        {
+            return new ProducerBuilder<TKey, TValue>(new ProducerConfig
+                {
+                    BootstrapServers = BootstrapServers
+                })
+                .Build();
+        }
 
         protected async Task ProduceMessageAsync<TKey, TValue>(TKey key, TValue value)
         {
@@ -60,6 +69,27 @@ namespace Confluent.Kafka.Utility.Tests.IntegrationTests.Tests
             {
                 Key = key,
                 Value = value
+            });
+        }
+
+        protected async Task CreateTopic(string topic, int partitions)
+        {
+            var adminClient = new AdminClientBuilder(new[]
+            {
+                new KeyValuePair<string, string>("bootstrap.servers", BootstrapServers)
+            }).Build();
+            
+            await adminClient.CreateTopicsAsync(new[]
+            {
+                new TopicSpecification()
+                {
+                    Name = topic,
+                    NumPartitions = partitions
+                }
+            }, new CreateTopicsOptions()
+            {
+                OperationTimeout = TimeSpan.FromSeconds(10),
+                RequestTimeout = TimeSpan.FromSeconds(10),
             });
         }
 
