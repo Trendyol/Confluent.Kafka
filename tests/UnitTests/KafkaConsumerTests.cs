@@ -1,4 +1,5 @@
 using System.Threading;
+using System.Threading.Tasks;
 using AutoFixture;
 using FluentAssertions;
 using Moq;
@@ -21,6 +22,12 @@ namespace Confluent.Kafka.Utility.Tests.UnitTests
             _mockConsumer = new Mock<IConsumer<string, string>>();
 
             _sut = new UnitTestConsumer(_topic, _mockConsumer.Object);
+        }
+        
+        [Test]
+        public async Task RunAsync_ShouldRun_WithDefaultParameter()
+        {
+            await _sut.RunAsync();
         }
 
         [Test]
