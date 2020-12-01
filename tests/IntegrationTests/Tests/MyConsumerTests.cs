@@ -1,98 +1,27 @@
-using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using AdminClient.Extensions;
 using AutoFixture;
-using Confluent.Kafka.Admin;
-using Confluent.Kafka.Utility.Tests.IntegrationTests.Consumers;
-using Confluent.Kafka.Utility.Tests.IntegrationTests.Fakes;
-using Confluent.Kafka.Utility.Tests.IntegrationTests.Producers;
 using FluentAssertions;
-using Microsoft.Extensions.Configuration;
 using NUnit.Framework;
 
 namespace Confluent.Kafka.Utility.Tests.IntegrationTests.Tests
 {
-    public class MyConsumerTests : IntegrationTestBase
+    public class MyConsumerTests : ConsumerTestBase
     {
         private IFixture _fixture;
-        private IKafkaProducer _producer;
-        private IConfiguration _configuration;
-        private ConsumerConfig _defaultConfig;
-        private string _bootstrapServers;
-        private string _topic;
 
         [SetUp]
-        public async Task SetUp()
+        public override async Task SetUp()
         {
+            await base.SetUp();
+            
             _fixture = new Fixture();
-            _producer = GetRequiredService<IKafkaProducer>();
-            _configuration = GetRequiredService<IConfiguration>();
-            _bootstrapServers = _configuration.GetValue<string>("BootstrapServers");
-            _defaultConfig = new ConsumerConfig
-            {
-                BootstrapServers = _bootstrapServers,
-                GroupId = Guid.NewGuid().ToString()
-            };
-            _topic = Guid.NewGuid().ToString();
-            await CreateTopic(_topic);
         }
 
         [TearDown]
-        public async Task TearDown()
+        public override async Task TearDown()
         {
-            await DeleteTopic(_topic);
-            _topic = null;
-        }
-
-        private ConsumerImpl<TKey, TValue> CreateConsumer<TKey, TValue>(string topic)
-        {
-            var consumer = new ConsumerBuilder<TKey, TValue>(_defaultConfig)
-                .Build();
-            return new ConsumerImpl<TKey, TValue>(topic, consumer);
-        }
-
-        private async Task ProduceMessageAsync<TKey, TValue>(TKey key, TValue value)
-        {
-            await _producer.ProduceAsync<TKey, TValue>(_topic, new Message<TKey, TValue>
-            {
-                Key = key,
-                Value = value
-            });
-        }
-        
-        private async Task CreateTopic(string topic)
-        {
-            var exists = AdminClientHelper.TopicExists(_bootstrapServers, topic);
-
-            if (exists)
-            {
-                await AdminClientHelper.DeleteTopicAsync(_bootstrapServers, topic);
-            }
-
-            await AdminClientHelper.CreateDefaultTopicAsync(_bootstrapServers, topic);
-        }
-        
-        private async Task DeleteTopic(string topic)
-        {
-            var exists = AdminClientHelper.TopicExists(_bootstrapServers, topic);
-
-            if (!exists)
-            {
-                return;
-            }
-            
-            var client = new AdminClientBuilder(new []
-            {
-                new KeyValuePair<string, string>("bootstrap.servers", _bootstrapServers), 
-            }).Build();
-
-            await client.DeleteTopicsAsync(new[] {topic}, new DeleteTopicsOptions()
-            {
-                OperationTimeout = TimeSpan.FromSeconds(10),
-                RequestTimeout = TimeSpan.FromSeconds(10),
-            });
+            await base.TearDown();
         }
 
         [Test]
@@ -104,7 +33,7 @@ namespace Confluent.Kafka.Utility.Tests.IntegrationTests.Tests
             
             var processedRecord = null as ConsumeResult<string, string>;
 
-            using var consumer = CreateConsumer<string, string>(_topic);
+            using var consumer = CreateConsumer<string, string>(Topic);
 
             await consumer.RunAsync();
             
@@ -130,7 +59,7 @@ namespace Confluent.Kafka.Utility.Tests.IntegrationTests.Tests
             var key = _fixture.Create<double>();
             var value = _fixture.Create<double>();
 
-            using var consumer = CreateConsumer<string, string>(_topic);
+            using var consumer = CreateConsumer<string, string>(Topic);
             
             await consumer.RunAsync();
 
@@ -145,7 +74,7 @@ namespace Confluent.Kafka.Utility.Tests.IntegrationTests.Tests
                 Assert.Fail();
             };
 
-            await _producer.ProduceAsync(_topic, new Message<double, double>
+            await Producer.ProduceAsync(Topic, new Message<double, double>
             {
                 Key = key,
                 Value = value
@@ -158,7 +87,7 @@ namespace Confluent.Kafka.Utility.Tests.IntegrationTests.Tests
             var key = _fixture.Create<long>();
             var value = _fixture.Create<long>();
 
-            using var consumer = CreateConsumer<long, long>(_topic);
+            using var consumer = CreateConsumer<long, long>(Topic);
 
             await consumer.RunAsync();
 
@@ -196,7 +125,7 @@ namespace Confluent.Kafka.Utility.Tests.IntegrationTests.Tests
         {
             var key = _fixture.Create<string>();
             var value = _fixture.Create<string>();
-            using var consumer = CreateConsumer<long, long>(_topic);
+            using var consumer = CreateConsumer<long, long>(Topic);
             
             var cts = new CancellationTokenSource();
 

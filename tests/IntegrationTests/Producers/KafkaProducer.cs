@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace Confluent.Kafka.Utility.Tests.IntegrationTests.Producers
 {
-    public class KafkaProducer : IKafkaProducer
+    public sealed class KafkaProducer : IKafkaProducer
     {
         private readonly IConfiguration _configuration;
 
@@ -14,7 +14,7 @@ namespace Confluent.Kafka.Utility.Tests.IntegrationTests.Producers
         
         public async Task ProduceAsync<TKey, TValue>(string topic, Message<TKey, TValue> message)
         {
-            var producer = new ProducerBuilder<TKey, TValue>(new ProducerConfig
+            using var producer = new ProducerBuilder<TKey, TValue>(new ProducerConfig
                 {
                     BootstrapServers = _configuration.GetValue<string>("BootstrapServers")
                 })
