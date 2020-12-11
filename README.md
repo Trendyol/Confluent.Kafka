@@ -3,6 +3,8 @@
 A wrapper consumer around Confluent .NET `IConsumer<,>` to make easier use of Kafka.
 
 # Usage
+
+Implement a consumer class deriving from `KafkaConsumer<TKey, TValue>`:
 ``` cs
 public class KafkaConsumerImpl : KafkaConsumer<string, string>
 {
@@ -32,7 +34,7 @@ public class KafkaConsumerImpl : KafkaConsumer<string, string>
 }
 ```
 
-Run consumer:
+Run consumer like this:
 ``` cs
 var consumer = new KafkaConsumerImpl(
                 "TOPIC",
