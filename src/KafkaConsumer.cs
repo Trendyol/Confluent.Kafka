@@ -11,6 +11,8 @@ namespace Confluent.Kafka.Utility
         public Task RunAsync(KafkaConfiguration configuration, 
             CancellationToken cancellationToken = default)
         {
+            ValidateConfiguration(configuration);
+            
             Consumer = BuildConsumer(configuration);
             
             Task.Factory.StartNew(async () =>
@@ -79,6 +81,29 @@ namespace Confluent.Kafka.Utility
             }
             
             Consumer.Close();
+        }
+        
+        private void ValidateConfiguration(KafkaConfiguration? configuration)
+        {
+            if (configuration == null)
+            {
+                throw new ArgumentNullException(nameof(configuration));
+            }
+
+            var topics = configuration.Topics;
+            
+            if (topics == null)
+            {
+                throw new ArgumentNullException(nameof(topics));
+            }
+
+            foreach (var topic in topics)
+            {
+                if (topic == null)
+                {
+                    throw new ArgumentNullException(nameof(topic));
+                }
+            }
         }
 
         private IConsumer<string, string> BuildConsumer(KafkaConfiguration configuration)
