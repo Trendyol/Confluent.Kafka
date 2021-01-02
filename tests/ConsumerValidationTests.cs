@@ -6,7 +6,7 @@ using NUnit.Framework;
 
 namespace Confluent.Kafka.Utility.Tests
 {
-    public class ConsumerTests
+    public class ConsumerValidationTests
     {
         [Test]
         public void RunAsync_GivenNullConfiguration_ShouldThrowArgumentNullException()
