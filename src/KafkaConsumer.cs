@@ -11,6 +11,8 @@ namespace Confluent.Kafka.Utility
         public Task RunAsync(KafkaConfiguration configuration, 
             CancellationToken cancellationToken = default)
         {
+            Consumer = BuildConsumer(configuration);
+            
             Task.Factory.StartNew(async () =>
                 {
                     await StartConsumeLoop(configuration, cancellationToken);
@@ -22,8 +24,6 @@ namespace Confluent.Kafka.Utility
 
         private async Task StartConsumeLoop(KafkaConfiguration kafkaConfiguration, CancellationToken token)
         {
-            Consumer = BuildConsumer(kafkaConfiguration);
-            
             Consumer.Subscribe(kafkaConfiguration.Topics);
 
             while (!token.IsCancellationRequested)
