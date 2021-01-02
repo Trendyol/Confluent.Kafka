@@ -87,14 +87,14 @@ namespace Confluent.Kafka.Utility
         {
             if (configuration == null)
             {
-                throw new ArgumentNullException(nameof(configuration));
+                throw new ArgumentNullException(nameof(KafkaConfiguration));
             }
 
             var topics = configuration.Topics;
             
             if (topics == null)
             {
-                throw new ArgumentNullException(nameof(topics));
+                throw new ArgumentNullException(nameof(KafkaConfiguration.Topics));
             }
 
             foreach (var topic in topics)
