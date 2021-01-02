@@ -4,44 +4,41 @@ using System.Threading.Tasks;
 
 namespace Confluent.Kafka.Utility
 {
-    public abstract class KafkaConsumer<TKey, TValue> : IKafkaConsumer
+    public abstract class KafkaConsumer : IKafkaConsumer
     {
-        private bool _disposed;
-        private readonly string _topic;
-        private readonly IConsumer<TKey, TValue> _consumer;
-
-        protected KafkaConsumer(string topic,
-            IConsumer<TKey, TValue> consumer)
+        protected IConsumer<string, string> Consumer;
+        
+        public Task RunAsync(KafkaConfiguration configuration, 
+            CancellationToken cancellationToken = default)
         {
-            _topic = topic ?? throw new ArgumentNullException(nameof(topic));
-            _consumer = consumer;
-        }
-
-        public Task RunAsync(CancellationToken cancellationToken = default)
-        {
-            Task.Factory.StartNew(async () => await StartConsumerLoop(cancellationToken),
+            Task.Factory.StartNew(async () =>
+                {
+                    await StartConsumeLoop(configuration, cancellationToken);
+                },
                 cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
             return Task.CompletedTask;
         }
 
-        private async Task StartConsumerLoop(CancellationToken token)
+        private async Task StartConsumeLoop(KafkaConfiguration kafkaConfiguration, CancellationToken token)
         {
-            _consumer.Subscribe(_topic);
+            Consumer = BuildConsumer(kafkaConfiguration);
+            
+            Consumer.Subscribe(kafkaConfiguration.Topics);
 
             while (!token.IsCancellationRequested)
             {
                 try
                 {
-                    var result = null as ConsumeResult<TKey, TValue>;
+                    var result = null as ConsumeResult<string, string>;
 
                     try
                     {
-                        result = _consumer.Consume(token);
+                        result = Consumer.Consume(token);
                     }
                     catch (ConsumeException e)
                     {
-                        await OnConsumeError(e);
+                        await OnError(e, result);
                         continue;
                     }
 
@@ -52,20 +49,20 @@ namespace Confluent.Kafka.Utility
 
                     try
                     {
-                        await ProcessRecord(result);
+                        await OnConsume(result);
                     }
                     catch (Exception e)
                     {
-                        await OnProcessError(e, result);
+                        await OnError(e, result);
                     }
-
+                    
                     try
                     {
-                        _consumer.Commit(result);
+                        Consumer.Commit(result);
                     }
                     catch (KafkaException e)
                     {
-                        await OnCommitError(e, result);
+                        await OnError(e, result);
                     }
                 }
                 catch (OperationCanceledException)
@@ -84,33 +81,32 @@ namespace Confluent.Kafka.Utility
                 {
                     break;
                 }
+                catch (Exception e)
+                {
+                    await OnError(e, null);
+                }
             }
+            
+            Consumer.Close();
+        }
+
+        private IConsumer<string, string> BuildConsumer(KafkaConfiguration configuration)
+        {
+            var consumerConfig = configuration as ConsumerConfig;
+
+            return new ConsumerBuilder<string, string>(consumerConfig)
+                .SetErrorHandler(configuration.ErrorHandler)
+                .SetKeyDeserializer(configuration.KeyDeserializer)
+                .SetValueDeserializer(configuration.ValueDeserializer)
+                .SetLogHandler(configuration.LogHandler)
+                .SetStatisticsHandler(configuration.StatisticsHandler)
+                .SetOffsetsCommittedHandler(configuration.OffsetsCommittedHandler)
+                .SetPartitionsAssignedHandler(configuration.PartitionsAssignedHandler)
+                .SetPartitionsRevokedHandler(configuration.PartitionsRevokedHandler)
+                .Build();
         }
         
-        protected abstract Task ProcessRecord(ConsumeResult<TKey, TValue> result);
-        protected abstract Task OnProcessError(Exception exception, ConsumeResult<TKey, TValue> result);
-        protected abstract Task OnConsumeError(ConsumeException exception);
-        protected abstract Task OnCommitError(KafkaException exception, ConsumeResult<TKey, TValue> result);
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (_disposed)
-            {
-                return;
-            }
-
-            _disposed = true;
-
-            if (disposing)
-            {
-                _consumer.Close();
-            }
-        }
+        protected abstract Task OnConsume(ConsumeResult<string, string> result);
+        protected abstract Task OnError(Exception exception, ConsumeResult<string, string>? result);
     }
 }
