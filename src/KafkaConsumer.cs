@@ -55,15 +55,6 @@ namespace Confluent.Kafka.Utility
                     {
                         await OnError(e, result);
                     }
-                    
-                    try
-                    {
-                        Consumer.Commit(result);
-                    }
-                    catch (KafkaException e)
-                    {
-                        await OnError(e, result);
-                    }
                 }
                 catch (OperationCanceledException)
                 {
