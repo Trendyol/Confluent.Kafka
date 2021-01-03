@@ -4,50 +4,33 @@ A wrapper consumer around Confluent .NET `IConsumer<,>` to make easier use of Ka
 
 # Usage
 
-Implement a consumer class deriving from `KafkaConsumer<TKey, TValue>`:
+Implement a consumer class deriving from `KafkaConsumer`:
 ``` cs
-public class KafkaConsumerImpl : KafkaConsumer<string, string>
+class OrderCreatedEventConsumer : KafkaConsumer
 {
-    public KafkaConsumerImpl(string topic, IConsumer<string, string> consumer) : base(topic, consumer)
-    {
-    }
-
-    protected override Task ProcessRecord(ConsumeResult<string, string> result)
+    protected override Task OnConsume(ConsumeResult<string, string> result)
     {
         throw new NotImplementedException();
     }
 
-    protected override Task OnProcessError(Exception exception, ConsumeResult<string, string> result)
-    {
-        throw new NotImplementedException();
-    }
-
-    protected override Task OnConsumeError(ConsumeException exception)
-    {
-        throw new NotImplementedException();
-    }
-
-    protected override Task OnCommitError(KafkaException exception, ConsumeResult<string, string> result)
+    protected override Task OnError(Exception exception, ConsumeResult<string, string>? result)
     {
         throw new NotImplementedException();
     }
 }
 ```
 
-Run consumer like this:
+Run your consumer like this:
 ``` cs
-var consumer = new KafkaConsumerImpl(
-                "TOPIC",
-                new ConsumerBuilder<string, string>(
-                    new ConsumerConfig
-                {
-                    BootstrapServers = "BOOTSTRAP_SERVERS",
-                    GroupId = "GROUP_ID"
-                }).Build());
+var consumer = new OrderCreatedEventConsumer();
+var config = new KafkaConfiguration()
+{
+    Topics = new []{ "OrderCreatedEvent" },
+    BootstrapServers = "BOOTSTRAP_SERVERS",
+    GroupId = "orderCreatedEventListener",
+};
 
-var cts = new CancellationTokenSource();
-
-await consumer.RunAsync(cts.Token);
+await consumer.RunAsync(config);
 ```
 
 ## License
