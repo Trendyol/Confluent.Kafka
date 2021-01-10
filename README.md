@@ -1,36 +1,55 @@
 # Confluent.Kafka.Lib
 
-A wrapper consumer around Confluent .NET `IConsumer<,>` to make easier use of Kafka.
+A wrapper consumer around Confluent .NET `IConsumer<string, string>` to make easier use of Kafka consumers.
 
 # Usage
 
 Implement a consumer class deriving from `KafkaConsumer`:
 ``` cs
-class OrderCreatedEventConsumer : KafkaConsumer
+class EventConsumer : KafkaConsumer
 {
     protected override Task OnConsume(ConsumeResult<string, string> result)
     {
-        throw new NotImplementedException();
+        await DoWork(result);
     }
 
     protected override Task OnError(Exception exception, ConsumeResult<string, string>? result)
     {
-        throw new NotImplementedException();
+        await DoWorkForException(exception, result);
     }
 }
 ```
 
-Run your consumer like this:
+You can create an instance of your `EventConsumer` via parameterized constructor:
 ``` cs
-var consumer = new OrderCreatedEventConsumer();
 var config = new KafkaConfiguration()
 {
-    Topics = new []{ "OrderCreatedEvent" },
+    Topics = new []{ "MyEvent" },
     BootstrapServers = "BOOTSTRAP_SERVERS",
-    GroupId = "orderCreatedEventListener",
+    GroupId = "myEventGroup",
 };
+var consumer = new EventConsumer(config);
+```
+or via using default constructor and `Initialize(config)` method:
+```
+var config = new KafkaConfiguration()
+{
+    Topics = new []{ "MyEvent" },
+    BootstrapServers = "BOOTSTRAP_SERVERS",
+    GroupId = "myEventGroup",
+};
+var consumer = new EventConsumer();
+consumer.Initialize(config);
+```
 
-await consumer.RunAsync(config);
+And then start your consumer via `RunAsync` method, you can either give a `CancellationToken` or use the default token:
+```
+await consumer.RunAsync();
+```
+or
+```
+var cts = new CancellationTokenSource();
+await consumer.RunAsync(cts.Token);
 ```
 
 ## License
