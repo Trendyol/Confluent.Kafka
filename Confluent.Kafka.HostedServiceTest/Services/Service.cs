@@ -1,6 +1,6 @@
 using System;
 
-namespace TestApplication
+namespace TestApplication.Services
 {
     public class Service : IService
     {

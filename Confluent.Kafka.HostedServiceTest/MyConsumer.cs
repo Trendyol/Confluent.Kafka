@@ -2,20 +2,17 @@ using System;
 using System.Threading.Tasks;
 using Confluent.Kafka;
 using Confluent.Kafka.Utility;
-using Microsoft.Extensions.Configuration;
+using TestApplication.Services;
 
 namespace TestApplication
 {
     public class MyConsumer : KafkaConsumer
     {
         private readonly IService _service;
-        private readonly IConfiguration _configuration;
 
-        public MyConsumer(IService service, 
-            IConfiguration configuration)
+        public MyConsumer(IService service)
         {
             _service = service;
-            _configuration = configuration;
         }
 
         protected override Task OnConsume(ConsumeResult<string, string> result)
@@ -23,7 +20,6 @@ namespace TestApplication
             var resultMessage = result.Message;
             var output = $"Key : {resultMessage.Key}, Value : {resultMessage.Value}";
             
-            _service.WriteToConsole(_configuration.GetValue<string>("BootstrapServers"));
             _service.WriteToConsole(output);
             
             return Task.CompletedTask;

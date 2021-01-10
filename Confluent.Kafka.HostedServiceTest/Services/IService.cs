@@ -1,4 +1,4 @@
-namespace TestApplication
+namespace TestApplication.Services
 {
     public interface IService
     {
