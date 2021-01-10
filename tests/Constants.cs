@@ -2,6 +2,6 @@ namespace Trendyol.Confluent.Kafka.Tests
 {
     public class Constants
     {
-        public const string BootstrapServers = "BOOTSTRAP_SERVERS";
+        public const string BootstrapServers = "localhost:9092";
     }
 }
