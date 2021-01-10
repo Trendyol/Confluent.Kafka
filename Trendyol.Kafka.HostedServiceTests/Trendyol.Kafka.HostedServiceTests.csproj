@@ -27,6 +27,6 @@
         <PackageReference Include="AdminClientHelpers.Confluent.Kafka" Version="1.0.3" />
     </ItemGroup>
     <ItemGroup>
-      <ProjectReference Include="..\src\Confluent.Kafka.Utility.csproj" />
+      <ProjectReference Include="..\src\Trendyol.Kafka.csproj" />
     </ItemGroup>
 </Project>

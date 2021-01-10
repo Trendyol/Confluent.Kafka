@@ -1,10 +1,10 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Confluent.Kafka.Utility", "src\Confluent.Kafka.Utility.csproj", "{0818D833-CC41-47DB-AE3E-17C734E1B05F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Trendyol.Kafka", "src\Trendyol.Kafka.csproj", "{0818D833-CC41-47DB-AE3E-17C734E1B05F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Confluent.Kafka.Utility.Tests", "tests\Confluent.Kafka.Utility.Tests.csproj", "{984D13B0-C3BA-4798-90EE-16157D7B2E23}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Trendyol.Kafka.Tests", "tests\Trendyol.Kafka.Tests.csproj", "{984D13B0-C3BA-4798-90EE-16157D7B2E23}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Confluent.Kafka.HostedServiceTest", "Confluent.Kafka.HostedServiceTest\Confluent.Kafka.HostedServiceTest.csproj", "{8859BF09-C9B6-4778-BCC9-8CFF56634868}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Trendyol.Kafka.HostedServiceTests", "Trendyol.Kafka.HostedServiceTests\Trendyol.Kafka.HostedServiceTests.csproj", "{8859BF09-C9B6-4778-BCC9-8CFF56634868}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -18,7 +18,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\src\Confluent.Kafka.Utility.csproj" />
+      <ProjectReference Include="..\src\Trendyol.Kafka.csproj" />
     </ItemGroup>
     
 </Project>
