@@ -54,7 +54,7 @@ await consumer.RunAsync(cts.Token);
 
 # Usage via dependency injection
 Register your `KafkaConsumer` using `AddKafkaConsumer` extension method:
-```
+``` cs
 services.AddKafkaConsumer<MyConsumer>(configuration =>
             {
                 configuration.Topics = new[] {"MyTopic"};
@@ -63,7 +63,7 @@ services.AddKafkaConsumer<MyConsumer>(configuration =>
             });
 ```
 And use all your registered services in your derived consumer:
-```
+``` cs
 using System;
 using System.Threading.Tasks;
 using Confluent.Kafka;
