@@ -1,4 +1,4 @@
-# Confluent.Kafka.Lib
+# Trendyol.Confluent.Kafka
 
 A wrapper consumer around Confluent .NET `IConsumer<string, string>` to make easier use of Kafka consumers.
 
