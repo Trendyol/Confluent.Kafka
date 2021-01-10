@@ -31,7 +31,7 @@ var config = new KafkaConfiguration()
 var consumer = new EventConsumer(config);
 ```
 or via using default constructor and `Initialize(config)` method:
-```
+``` cs
 var config = new KafkaConfiguration()
 {
     Topics = new []{ "MyEvent" },
@@ -43,14 +43,62 @@ consumer.Initialize(config);
 ```
 
 And then start your consumer via `RunAsync` method, you can either give a `CancellationToken` or use the default token:
-```
+``` cs
 await consumer.RunAsync();
 ```
 or
-```
+``` cs
 var cts = new CancellationTokenSource();
 await consumer.RunAsync(cts.Token);
 ```
+
+# Usage via dependency injection
+Register your `KafkaConsumer` using `AddKafkaConsumer` extension method:
+```
+services.AddKafkaConsumer<MyConsumer>(configuration =>
+            {
+                configuration.Topics = new[] {"MyTopic"};
+                configuration.GroupId = "MyGroup";
+                configuration.BootstrapServers = "BOOTSTRAP_SERVERS";
+            });
+```
+And use all your registered services in your derived consumer:
+```
+using System;
+using System.Threading.Tasks;
+using Confluent.Kafka;
+
+namespace TestApplication
+{
+    public class MyConsumer : KafkaConsumer
+    {
+        private readonly IService _service;
+
+        public MyConsumer(IService service)
+        {
+            _service = service;
+        }
+
+        protected override Task OnConsume(ConsumeResult<string, string> result)
+        {
+            _service.DoWork(result);
+            
+            return Task.CompletedTask;
+        }
+
+        protected override Task OnError(Exception exception, ConsumeResult<string, string>? result)
+        {
+            _service.DoWorkForException(exception, result);
+            
+            return Task.CompletedTask;
+        }
+    }
+}
+```
+
+# Installation
+Installing via NuGet will soon be available.
+For the time being, you can download the source here and use it in your project.
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
