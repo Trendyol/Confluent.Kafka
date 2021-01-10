@@ -8,12 +8,12 @@ Implement a consumer class deriving from `KafkaConsumer`:
 ``` cs
 class EventConsumer : KafkaConsumer
 {
-    protected override Task OnConsume(ConsumeResult<string, string> result)
+    protected override async Task OnConsume(ConsumeResult<string, string> result)
     {
         await DoWork(result);
     }
 
-    protected override Task OnError(Exception exception, ConsumeResult<string, string>? result)
+    protected override async Task OnError(Exception exception, ConsumeResult<string, string>? result)
     {
         await DoWorkForException(exception, result);
     }
@@ -79,18 +79,14 @@ namespace TestApplication
             _service = service;
         }
 
-        protected override Task OnConsume(ConsumeResult<string, string> result)
+        protected override async Task OnConsume(ConsumeResult<string, string> result)
         {
-            _service.DoWork(result);
-            
-            return Task.CompletedTask;
+            await _service.DoWorkAsync(result);
         }
 
-        protected override Task OnError(Exception exception, ConsumeResult<string, string>? result)
+        protected override async Task OnError(Exception exception, ConsumeResult<string, string>? result)
         {
-            _service.DoWorkForException(exception, result);
-            
-            return Task.CompletedTask;
+            await _service.DoWorkForExceptionAsync(exception, result);
         }
     }
 }
