@@ -1,54 +1,104 @@
 # Confluent.Kafka.Lib
 
-A wrapper consumer around Confluent .NET `IConsumer<,>` to make easier use of Kafka.
+A wrapper consumer around Confluent .NET `IConsumer<string, string>` to make easier use of Kafka consumers.
 
 # Usage
 
-Implement a consumer class deriving from `KafkaConsumer<TKey, TValue>`:
+Implement a consumer class deriving from `KafkaConsumer`:
 ``` cs
-public class KafkaConsumerImpl : KafkaConsumer<string, string>
+class EventConsumer : KafkaConsumer
 {
-    public KafkaConsumerImpl(string topic, IConsumer<string, string> consumer) : base(topic, consumer)
+    protected override Task OnConsume(ConsumeResult<string, string> result)
     {
+        await DoWork(result);
     }
 
-    protected override Task ProcessRecord(ConsumeResult<string, string> result)
+    protected override Task OnError(Exception exception, ConsumeResult<string, string>? result)
     {
-        throw new NotImplementedException();
-    }
-
-    protected override Task OnProcessError(Exception exception, ConsumeResult<string, string> result)
-    {
-        throw new NotImplementedException();
-    }
-
-    protected override Task OnConsumeError(ConsumeException exception)
-    {
-        throw new NotImplementedException();
-    }
-
-    protected override Task OnCommitError(KafkaException exception, ConsumeResult<string, string> result)
-    {
-        throw new NotImplementedException();
+        await DoWorkForException(exception, result);
     }
 }
 ```
 
-Run consumer like this:
+You can create an instance of your `EventConsumer` via parameterized constructor:
 ``` cs
-var consumer = new KafkaConsumerImpl(
-                "TOPIC",
-                new ConsumerBuilder<string, string>(
-                    new ConsumerConfig
-                {
-                    BootstrapServers = "BOOTSTRAP_SERVERS",
-                    GroupId = "GROUP_ID"
-                }).Build());
+var config = new KafkaConfiguration()
+{
+    Topics = new []{ "MyEvent" },
+    BootstrapServers = "BOOTSTRAP_SERVERS",
+    GroupId = "myEventGroup",
+};
+var consumer = new EventConsumer(config);
+```
+or via using default constructor and `Initialize(config)` method:
+``` cs
+var config = new KafkaConfiguration()
+{
+    Topics = new []{ "MyEvent" },
+    BootstrapServers = "BOOTSTRAP_SERVERS",
+    GroupId = "myEventGroup",
+};
+var consumer = new EventConsumer();
+consumer.Initialize(config);
+```
 
+And then start your consumer via `RunAsync` method, you can either give a `CancellationToken` or use the default token:
+``` cs
+await consumer.RunAsync();
+```
+or
+``` cs
 var cts = new CancellationTokenSource();
-
 await consumer.RunAsync(cts.Token);
 ```
+
+# Usage via dependency injection
+Register your `KafkaConsumer` using `AddKafkaConsumer` extension method:
+```
+services.AddKafkaConsumer<MyConsumer>(configuration =>
+            {
+                configuration.Topics = new[] {"MyTopic"};
+                configuration.GroupId = "MyGroup";
+                configuration.BootstrapServers = "BOOTSTRAP_SERVERS";
+            });
+```
+And use all your registered services in your derived consumer:
+```
+using System;
+using System.Threading.Tasks;
+using Confluent.Kafka;
+
+namespace TestApplication
+{
+    public class MyConsumer : KafkaConsumer
+    {
+        private readonly IService _service;
+
+        public MyConsumer(IService service)
+        {
+            _service = service;
+        }
+
+        protected override Task OnConsume(ConsumeResult<string, string> result)
+        {
+            _service.DoWork(result);
+            
+            return Task.CompletedTask;
+        }
+
+        protected override Task OnError(Exception exception, ConsumeResult<string, string>? result)
+        {
+            _service.DoWorkForException(exception, result);
+            
+            return Task.CompletedTask;
+        }
+    }
+}
+```
+
+# Installation
+Installing via NuGet will soon be available.
+For the time being, you can download the source here and use it in your project.
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
