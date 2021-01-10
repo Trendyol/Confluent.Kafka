@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using static Confluent.Kafka.Utility.ErrorConstants;
 
 namespace Confluent.Kafka.Utility
 {
@@ -11,7 +12,7 @@ namespace Confluent.Kafka.Utility
         {
             if (configurationBuilder == null)
             {
-                throw new InvalidOperationException("Configuration builder cannot be null.");
+                throw new InvalidOperationException(ConfigurationBuilderCannotBeNullMessage);
             }
             
             var config = new KafkaConfiguration();

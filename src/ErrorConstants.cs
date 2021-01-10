@@ -6,5 +6,6 @@ namespace Confluent.Kafka.Utility
             "KafkaConsumer is already initialized.";
         public const string KafkaConsumerIsNotInitializedMessage =
             "You have to initialize KafkaConsumer either by parameterized constructor or by Initialize method.";
+        public const string ConfigurationBuilderCannotBeNullMessage = "Configuration builder cannot be null.";
     }
 }
