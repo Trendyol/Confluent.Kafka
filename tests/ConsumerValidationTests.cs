@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -8,6 +9,8 @@ namespace Confluent.Kafka.Utility.Tests
 {
     public class ConsumerValidationTests
     {
+        
+        
         [Test]
         public void RunAsync_GivenValidConfigurationInConstructor_ShouldStartSuccessfully()
         {
