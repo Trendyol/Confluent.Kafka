@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
-        <RootNamespace>Confluent.Kafka.Utility.Tests</RootNamespace>
+        <RootNamespace>Trendyol.Confluent.Kafka.Tests</RootNamespace>
         <LangVersion>latest</LangVersion>
     </PropertyGroup>
 
