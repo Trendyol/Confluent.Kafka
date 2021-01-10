@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using static Confluent.Kafka.Utility.ErrorConstants;
 
 namespace Confluent.Kafka.Utility
 {
@@ -22,7 +23,7 @@ namespace Confluent.Kafka.Utility
         public void Initialize(KafkaConfiguration configuration)
         {
             if (_initialized)
-                throw new InvalidOperationException("KafkaConsumer is already initialized.");
+                throw new InvalidOperationException(KafkaConsumerIsAlreadyInitializedMessage);
             
             _configuration = configuration;
             
@@ -36,7 +37,7 @@ namespace Confluent.Kafka.Utility
         public Task RunAsync(CancellationToken cancellationToken = default)
         {
             if (!_initialized)
-                throw new InvalidOperationException("You have to initialize KafkaConsumer.");
+                throw new InvalidOperationException(KafkaConsumerIsNotInitializedMessage);
             
             Task.Factory.StartNew(async () =>
                 {
