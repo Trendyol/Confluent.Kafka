@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Confluent.Kafka;
 using FluentAssertions;
 using NUnit.Framework;
 
-namespace Confluent.Kafka.Utility.Tests
+namespace Trendyol.Confluent.Kafka.Tests
 {
     public class ConsumerTests
     {

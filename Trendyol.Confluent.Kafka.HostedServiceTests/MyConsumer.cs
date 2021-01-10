@@ -1,10 +1,9 @@
 using System;
 using System.Threading.Tasks;
 using Confluent.Kafka;
-using Confluent.Kafka.Utility;
-using TestApplication.Services;
+using Trendyol.Confluent.Kafka.HostedServiceTests.Services;
 
-namespace TestApplication
+namespace Trendyol.Confluent.Kafka.HostedServiceTests
 {
     public class MyConsumer : KafkaConsumer
     {

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 
-namespace TestApplication
+namespace Trendyol.Confluent.Kafka.HostedServiceTests
 {
     public static class Program
     {

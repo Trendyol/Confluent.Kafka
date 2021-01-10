@@ -1,7 +1,6 @@
 using System.Threading.Tasks;
-using Confluent.Kafka.Utility;
 
-namespace TestApplication.Services
+namespace Trendyol.Confluent.Kafka.HostedServiceTests.Services
 {
     public interface IKafkaHelper
     {

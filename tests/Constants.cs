@@ -1,4 +1,4 @@
-namespace Confluent.Kafka.Utility.Tests
+namespace Trendyol.Confluent.Kafka.Tests
 {
     public class Constants
     {

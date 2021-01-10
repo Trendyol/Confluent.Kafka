@@ -2,7 +2,7 @@ using System;
 using FluentAssertions;
 using NUnit.Framework;
 
-namespace Confluent.Kafka.Utility.Tests.ValidationTests
+namespace Trendyol.Confluent.Kafka.Tests.ValidationTests
 {
     public class InitializeTests
     {

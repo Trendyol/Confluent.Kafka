@@ -1,7 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Confluent.Kafka.Utility
+namespace Trendyol.Confluent.Kafka
 {
     public interface IKafkaConsumer
     {

@@ -1,9 +1,9 @@
 using System;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
-using static Confluent.Kafka.Utility.ErrorConstants;
+using static Trendyol.Confluent.Kafka.ErrorConstants;
 
-namespace Confluent.Kafka.Utility
+namespace Trendyol.Confluent.Kafka
 {
     public static class ServiceCollectionExtensions
     {

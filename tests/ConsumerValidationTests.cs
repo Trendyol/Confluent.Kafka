@@ -1,11 +1,10 @@
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using NUnit.Framework;
 
-namespace Confluent.Kafka.Utility.Tests
+namespace Trendyol.Confluent.Kafka.Tests
 {
     public class ConsumerValidationTests
     {

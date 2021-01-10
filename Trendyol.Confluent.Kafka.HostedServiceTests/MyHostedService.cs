@@ -1,9 +1,9 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
-using TestApplication.Services;
+using Trendyol.Confluent.Kafka.HostedServiceTests.Services;
 
-namespace TestApplication
+namespace Trendyol.Confluent.Kafka.HostedServiceTests
 {
     public class MyHostedService : BackgroundService
     {

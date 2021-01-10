@@ -1,4 +1,4 @@
-namespace Confluent.Kafka.Utility
+namespace Trendyol.Confluent.Kafka
 {
     public static class ErrorConstants
     {

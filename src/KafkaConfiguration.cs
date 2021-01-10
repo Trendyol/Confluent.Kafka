@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
+using Confluent.Kafka;
 
-namespace Confluent.Kafka.Utility
+namespace Trendyol.Confluent.Kafka
 {
     public class KafkaConfiguration : ConsumerConfig
     {

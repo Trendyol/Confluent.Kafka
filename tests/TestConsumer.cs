@@ -1,7 +1,8 @@
 using System;
 using System.Threading.Tasks;
+using Confluent.Kafka;
 
-namespace Confluent.Kafka.Utility.Tests
+namespace Trendyol.Confluent.Kafka.Tests
 {
     public class TestConsumer : KafkaConsumer
     {

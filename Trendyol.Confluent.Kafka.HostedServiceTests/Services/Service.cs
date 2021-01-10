@@ -1,6 +1,6 @@
 using System;
 
-namespace TestApplication.Services
+namespace Trendyol.Confluent.Kafka.HostedServiceTests.Services
 {
     public class Service : IService
     {

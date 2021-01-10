@@ -1,13 +1,12 @@
 using System;
 using Confluent.Kafka;
-using Confluent.Kafka.Utility;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using TestApplication.Services;
+using Trendyol.Confluent.Kafka.HostedServiceTests.Services;
 
-namespace TestApplication
+namespace Trendyol.Confluent.Kafka.HostedServiceTests
 {
     public class Startup
     {

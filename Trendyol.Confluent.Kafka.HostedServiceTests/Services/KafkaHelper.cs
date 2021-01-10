@@ -4,9 +4,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using AdminClientHelpers.Confluent.Kafka;
 using Confluent.Kafka;
-using Confluent.Kafka.Utility;
 
-namespace TestApplication.Services
+namespace Trendyol.Confluent.Kafka.HostedServiceTests.Services
 {
     public class KafkaHelper : IKafkaHelper
     {

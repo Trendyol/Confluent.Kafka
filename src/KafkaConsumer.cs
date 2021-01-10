@@ -1,9 +1,10 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using static Confluent.Kafka.Utility.ErrorConstants;
+using Confluent.Kafka;
+using static Trendyol.Confluent.Kafka.ErrorConstants;
 
-namespace Confluent.Kafka.Utility
+namespace Trendyol.Confluent.Kafka
 {
     public abstract class KafkaConsumer : IKafkaConsumer
     {
