@@ -1,6 +1,6 @@
 namespace Confluent.Kafka.Utility
 {
-    public class ErrorConstants
+    public static class ErrorConstants
     {
         public const string KafkaConsumerIsAlreadyInitializedMessage =
             "KafkaConsumer is already initialized.";
