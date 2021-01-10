@@ -6,18 +6,42 @@ namespace Confluent.Kafka.Utility
 {
     public abstract class KafkaConsumer : IKafkaConsumer
     {
-        protected IConsumer<string, string> Consumer;
-        
-        public Task RunAsync(KafkaConfiguration configuration, 
-            CancellationToken cancellationToken = default)
+        private bool _initialized;
+        private KafkaConfiguration? _configuration;
+        protected IConsumer<string, string>? Consumer;
+
+        public KafkaConsumer()
         {
-            ValidateConfiguration(configuration);
+        }
+
+        public KafkaConsumer(KafkaConfiguration configuration)
+        {
+            Initialize(configuration);
+        }
+
+        public void Initialize(KafkaConfiguration configuration)
+        {
+            if (_initialized)
+                throw new InvalidOperationException("KafkaConsumer is already initialized.");
+            
+            _configuration = configuration;
+            
+            ValidateConfiguration(_configuration);
             
             Consumer = BuildConsumer(configuration);
             
+            _initialized = true;
+        }
+        
+        public Task RunAsync(CancellationToken cancellationToken = default)
+        {
+            if (!_initialized)
+                throw new InvalidOperationException("You have to initialize KafkaConsumer.");
+            
             Task.Factory.StartNew(async () =>
                 {
-                    await StartConsumeLoop(configuration, cancellationToken);
+                    // KafkaConsumer is initialized and _configuration cannot be null
+                    await StartConsumeLoop(_configuration!, cancellationToken);
                 },
                 cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
@@ -26,7 +50,8 @@ namespace Confluent.Kafka.Utility
 
         private async Task StartConsumeLoop(KafkaConfiguration kafkaConfiguration, CancellationToken token)
         {
-            Consumer.Subscribe(kafkaConfiguration.Topics);
+            // KafkaConsumer is initialized and Consumer cannot be null
+            Consumer!.Subscribe(kafkaConfiguration.Topics);
 
             while (!token.IsCancellationRequested)
             {
@@ -45,9 +70,7 @@ namespace Confluent.Kafka.Utility
                     }
 
                     if (result.Message == null)
-                    {
                         continue;
-                    }
 
                     try
                     {
@@ -86,24 +109,16 @@ namespace Confluent.Kafka.Utility
         private void ValidateConfiguration(KafkaConfiguration? configuration)
         {
             if (configuration == null)
-            {
                 throw new ArgumentNullException(nameof(KafkaConfiguration));
-            }
 
             var topics = configuration.Topics;
             
             if (topics == null)
-            {
                 throw new ArgumentNullException(nameof(KafkaConfiguration.Topics));
-            }
 
             foreach (var topic in topics)
-            {
                 if (topic == null)
-                {
                     throw new ArgumentNullException(nameof(topic));
-                }
-            }
         }
 
         private IConsumer<string, string> BuildConsumer(KafkaConfiguration configuration)

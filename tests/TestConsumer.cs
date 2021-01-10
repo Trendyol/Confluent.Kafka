@@ -5,6 +5,14 @@ namespace Confluent.Kafka.Utility.Tests
 {
     public class TestConsumer : KafkaConsumer
     {
+        public TestConsumer()
+        {
+        }
+
+        public TestConsumer(KafkaConfiguration configuration) : base(configuration)
+        {
+        }
+        
         public event Action<ConsumeResult<string, string>> OnConsumeEvent = delegate {  }; 
         public event Action<Exception, ConsumeResult<string, string>> OnErrorEvent = delegate {  };
         

@@ -9,13 +9,32 @@ namespace Confluent.Kafka.Utility.Tests
     public class ConsumerValidationTests
     {
         [Test]
-        public void RunAsync_GivenNullConfiguration_ShouldThrowArgumentNullException()
+        public void RunAsync_GivenValidConfigurationInConstructor_ShouldStartSuccessfully()
+        {
+            var configuration = new KafkaConfiguration
+            {
+                Topics = new [] {Guid.NewGuid().ToString()},
+                BootstrapServers = Constants.BootstrapServers,
+                GroupId = Guid.NewGuid().ToString()
+            };
+            var consumer = new TestConsumer(configuration);
+
+            Assert.DoesNotThrowAsync(async () =>
+            {
+                await consumer.RunAsync();
+
+                await Task.Delay(500);
+            });
+        }
+        
+        [Test]
+        public void RunAsync_GivenNoParameters_ShouldThrowInvalidOperationException()
         {
             var consumer = new TestConsumer();
 
-            Assert.ThrowsAsync<ArgumentNullException>(async () =>
+            Assert.ThrowsAsync<InvalidOperationException>(async () =>
             {
-                await consumer.RunAsync(null, CancellationToken.None);
+                await consumer.RunAsync();
             });
         }
         
@@ -27,9 +46,9 @@ namespace Confluent.Kafka.Utility.Tests
             {
             };
 
-            var exception = Assert.ThrowsAsync<ArgumentNullException>(async () =>
+            var exception = Assert.Throws<ArgumentNullException>(() =>
             {
-                await consumer.RunAsync(configuration, CancellationToken.None);
+                consumer.Initialize(configuration);
             });
             exception.ParamName.Should().Be(nameof(KafkaConfiguration.Topics));
         }
@@ -43,9 +62,9 @@ namespace Confluent.Kafka.Utility.Tests
                 Topics = new []{null as string}
             };
 
-            var exception = Assert.ThrowsAsync<ArgumentNullException>(async () =>
+            var exception = Assert.Throws<ArgumentNullException>(() =>
             {
-                await consumer.RunAsync(configuration, CancellationToken.None);
+                consumer.Initialize(configuration);
             });
             exception.ParamName.Should().Be("topic");
         }
@@ -59,11 +78,11 @@ namespace Confluent.Kafka.Utility.Tests
                 Topics = new []{"TestTopic"}
             };
 
-            var exception = Assert.ThrowsAsync<ArgumentException>(async () =>
+            var exception = Assert.ThrowsAsync<InvalidOperationException>(async () =>
             {
-                await consumer.RunAsync(configuration, CancellationToken.None);
+                await consumer.RunAsync(CancellationToken.None);
             });
-            exception.Message.Should().Contain("'group.id'");
+            exception.Message.Should().Be("You have to initialize KafkaConsumer.");
         }
         
         [Test]
@@ -75,8 +94,9 @@ namespace Confluent.Kafka.Utility.Tests
                 Topics = new []{"TestTopic"},
                 GroupId = Guid.NewGuid().ToString()
             };
+            consumer.Initialize(configuration);
             
-            await consumer.RunAsync(configuration, CancellationToken.None);
+            await consumer.RunAsync(CancellationToken.None);
 
             await Task.Delay(500);
         }

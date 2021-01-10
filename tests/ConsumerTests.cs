@@ -45,8 +45,9 @@ namespace Confluent.Kafka.Utility.Tests
                 BootstrapServers = Constants.BootstrapServers,
                 GroupId = Guid.NewGuid().ToString()
             };
+            consumer.Initialize(configuration);
 
-            await consumer.RunAsync(configuration, CancellationToken.None);
+            await consumer.RunAsync(CancellationToken.None);
 
             return consumer;
         }

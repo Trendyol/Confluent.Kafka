@@ -5,7 +5,6 @@ namespace Confluent.Kafka.Utility
 {
     public interface IKafkaConsumer
     {
-        Task RunAsync(KafkaConfiguration configuration,
-            CancellationToken cancellationToken = default);
+        Task RunAsync(CancellationToken cancellationToken = default);
     }
 }
