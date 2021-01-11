@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Confluent.Kafka;
 
 namespace Trendyol.Confluent.Kafka
@@ -17,5 +18,19 @@ namespace Trendyol.Confluent.Kafka
             PartitionsRevokedHandler { get; set; }
         public Action<IConsumer<string, string>, CommittedOffsets>? OffsetsCommittedHandler { get; set; }
         public IEnumerable<string>? Topics { get; set; }
+
+        public string? Topic
+        {
+            get => Topics?.First(); 
+            set
+            {
+                if (value == null)
+                {
+                    throw new ArgumentNullException(nameof(Topic));
+                }
+                
+                Topics = new[] {value};
+            }
+        }
     }
 }
