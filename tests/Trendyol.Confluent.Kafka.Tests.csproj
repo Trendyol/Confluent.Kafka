@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AdminClient.Extensions" Version="1.0.1" />
+        <PackageReference Include="AdminClientHelpers.Confluent.Kafka" Version="1.0.3" />
         <PackageReference Include="AutoFixture" Version="4.14.0" />
         <PackageReference Include="Moq" Version="4.15.1" />
         <PackageReference Include="NUnit" Version="3.12.0" />
