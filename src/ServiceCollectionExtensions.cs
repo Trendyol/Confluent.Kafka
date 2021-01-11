@@ -8,7 +8,8 @@ namespace Trendyol.Confluent.Kafka
     public static class ServiceCollectionExtensions
     {
         public static void AddKafkaConsumer<T>(this IServiceCollection services,
-            Action<KafkaConfiguration> configurationBuilder) where T : KafkaConsumer
+            Action<KafkaConfiguration> configurationBuilder,
+            ServiceLifetime lifetime = ServiceLifetime.Transient) where T : KafkaConsumer
         {
             if (configurationBuilder == null)
             {
@@ -24,8 +25,8 @@ namespace Trendyol.Confluent.Kafka
                 .GetParameters()
                 .Select(p => p.ParameterType)
                 .ToArray();
-
-            services.AddTransient(provider =>
+            
+            Func<IServiceProvider, T> implementationFactory = provider =>
             {
                 var parameters = parameterTypes
                     .Select(provider.GetRequiredService)
@@ -34,7 +35,10 @@ namespace Trendyol.Confluent.Kafka
                 var castedInstance = instance as T;
                 castedInstance!.Initialize(config);
                 return castedInstance;
-            });
+            };
+            
+            var descriptor = new ServiceDescriptor(typeof(T), implementationFactory, lifetime);
+            services.Add(descriptor);
         }
     }
 }
