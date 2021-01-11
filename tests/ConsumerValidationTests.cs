@@ -84,7 +84,7 @@ namespace Trendyol.Confluent.Kafka.Tests
             {
                 await consumer.RunAsync(CancellationToken.None);
             });
-            exception.Message.Should().Be("You have to initialize KafkaConsumer.");
+            exception.Message.Should().Contain("You have to initialize KafkaConsumer");
         }
         
         [Test]
