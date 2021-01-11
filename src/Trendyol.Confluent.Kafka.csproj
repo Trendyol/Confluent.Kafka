@@ -5,6 +5,7 @@
         <RootNamespace>Trendyol.Confluent.Kafka</RootNamespace>
         <LangVersion>latest</LangVersion>
         <Nullable>enable</Nullable>
+        <Version>1.0.0</Version>
     </PropertyGroup>
 
     <ItemGroup>
