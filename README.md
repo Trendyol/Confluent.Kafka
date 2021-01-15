@@ -2,6 +2,13 @@
 
 A wrapper consumer around Confluent .NET `IConsumer<string, string>` to make easier use of Kafka consumers.
 
+# Installation
+
+You can install the package via NuGet Package Manager.
+```
+PM > Install-Package Trendyol.Confluent.Kafka
+```
+
 # Usage
 
 Implement a consumer class deriving from `KafkaConsumer`:
@@ -24,7 +31,7 @@ You can create an instance of your `EventConsumer` via parameterized constructor
 ``` cs
 var config = new KafkaConfiguration()
 {
-    Topics = new []{ "MyEvent" },
+    Topic = "MyEvent",
     BootstrapServers = "BOOTSTRAP_SERVERS",
     GroupId = "myEventGroup",
 };
@@ -34,7 +41,7 @@ or via using default constructor and `Initialize(config)` method:
 ``` cs
 var config = new KafkaConfiguration()
 {
-    Topics = new []{ "MyEvent" },
+    Topic = "MyEvent",
     BootstrapServers = "BOOTSTRAP_SERVERS",
     GroupId = "myEventGroup",
 };
@@ -57,44 +64,33 @@ Register your `KafkaConsumer` using `AddKafkaConsumer` extension method:
 ``` cs
 services.AddKafkaConsumer<MyConsumer>(configuration =>
             {
-                configuration.Topics = new[] {"MyTopic"};
+                configuration.Topic = "MyTopic";
                 configuration.GroupId = "MyGroup";
                 configuration.BootstrapServers = "BOOTSTRAP_SERVERS";
             });
 ```
 And use all your registered services in your derived consumer:
 ``` cs
-using System;
-using System.Threading.Tasks;
-using Confluent.Kafka;
-
-namespace TestApplication
+public class MyConsumer : KafkaConsumer
 {
-    public class MyConsumer : KafkaConsumer
+    private readonly IService _service;
+
+    public MyConsumer(IService service)
     {
-        private readonly IService _service;
+        _service = service;
+    }
 
-        public MyConsumer(IService service)
-        {
-            _service = service;
-        }
+    protected override async Task OnConsume(ConsumeResult<string, string> result)
+    {
+        await _service.DoWorkAsync(result);
+    }
 
-        protected override async Task OnConsume(ConsumeResult<string, string> result)
-        {
-            await _service.DoWorkAsync(result);
-        }
-
-        protected override async Task OnError(Exception exception, ConsumeResult<string, string>? result)
-        {
-            await _service.DoWorkForExceptionAsync(exception, result);
-        }
+    protected override async Task OnError(Exception exception, ConsumeResult<string, string>? result)
+    {
+        await _service.DoWorkForExceptionAsync(exception, result);
     }
 }
 ```
-
-# Installation
-Installing via NuGet will soon be available.
-For the time being, you can download the source here and use it in your project.
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
