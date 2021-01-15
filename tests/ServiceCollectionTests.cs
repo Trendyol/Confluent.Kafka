@@ -190,5 +190,74 @@ namespace Trendyol.Confluent.Kafka.Tests
                 await AdminClientHelper.DeleteTopicAsync(bootstrapServers, topic);
             }
         }
+        
+        [Test]
+        public async Task RunAsync_GivenValidConfigurationAndProducedToMultiPartitionTopic_ShouldConsumeMessages()
+        {
+            var topic = Guid.NewGuid().ToString();
+            var bootstrapServers = Constants.BootstrapServers;
+            
+            try
+            {
+                var serviceCollection = new ServiceCollection();
+            
+                serviceCollection.AddKafkaConsumer<TestConsumer>(configuration =>
+                {
+                    configuration.Topic = topic;
+                    configuration.GroupId = Guid.NewGuid().ToString();
+                    configuration.BootstrapServers = bootstrapServers;
+                    configuration.AutoOffsetReset = AutoOffsetReset.Earliest;
+                });
+                
+                await AdminClientHelper.CreateTopicAsync(bootstrapServers, topic, 32);
+
+                var serviceProvider = serviceCollection.BuildServiceProvider();
+
+                var fixture = new Fixture();
+                var consumer = serviceProvider.GetRequiredService<TestConsumer>();
+                var mre = new ManualResetEvent(false);
+                var messages = fixture
+                    .CreateMany<Message<string, string>>(500)
+                    .ToList();
+                var count = 0;
+
+                consumer.OnConsumeEvent += result =>
+                {
+                    result.Message.Key
+                        .Should()
+                        .BeOneOf(messages.Select(m => m.Key));
+                    result.Message.Value
+                        .Should()
+                        .BeOneOf(messages.Select(m => m.Value));
+
+                    count++;
+
+                    if (count == messages.Count)
+                    {
+                        mre.Set();
+                    }
+                };
+
+                await consumer.RunAsync();
+
+                var producer = new ProducerBuilder<string, string>(new ProducerConfig
+                {
+                    BootstrapServers = bootstrapServers
+                }).Build();
+
+                foreach (var message in messages)
+                {
+                    producer.Produce(topic, message);
+                }
+
+                producer.Flush(TimeSpan.FromSeconds(5));
+
+                mre.WaitOne();
+            }
+            finally
+            {
+                await AdminClientHelper.DeleteTopicAsync(bootstrapServers, topic);
+            }
+        }
     }
 }
