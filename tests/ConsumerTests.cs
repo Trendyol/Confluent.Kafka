@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using AdminClientHelpers.Confluent.Kafka;
 using Confluent.Kafka;
 using FluentAssertions;
 using NUnit.Framework;
@@ -11,6 +12,22 @@ namespace Trendyol.Confluent.Kafka.Tests
 {
     public class ConsumerTests
     {
+        private string _currentTopic;
+        
+        [SetUp]
+        public async Task SetUp()
+        {
+            _currentTopic = Guid.NewGuid().ToString();
+
+            await AdminClientHelper.CreateTopicAsync(Constants.BootstrapServers, _currentTopic, new Random().Next(1, 50));
+        }
+
+        [TearDown]
+        public async Task TearDown()
+        {
+            await AdminClientHelper.DeleteTopicAsync(Constants.BootstrapServers, _currentTopic);
+        }
+        
         private List<Message<string, string>> CreateRandomMessages(int count)
         {
             return Enumerable.Range(0, count)
@@ -42,7 +59,7 @@ namespace Trendyol.Confluent.Kafka.Tests
             var consumer = new TestConsumer();
             var configuration = new KafkaConfiguration
             {
-                Topics = new []{"MyTopic"},
+                Topics = new []{topic},
                 BootstrapServers = Constants.BootstrapServers,
                 GroupId = Guid.NewGuid().ToString()
             };
@@ -56,8 +73,9 @@ namespace Trendyol.Confluent.Kafka.Tests
         [Test]
         public async Task RunAsync_GivenSingleMessage_ShouldConsumeMessage()
         {
-            var topic = "MyTopic";
-            var consumer = await StartKafkaConsumer(topic);
+            var isFaulted = false;
+            var exception = null as Exception;
+            var consumer = await StartKafkaConsumer(_currentTopic);
             var mre = new ManualResetEvent(false);
             var message = CreateRandomMessages(1).First();
             
@@ -67,24 +85,32 @@ namespace Trendyol.Confluent.Kafka.Tests
                 result.Message.Value.Should().Be(message.Value);
                 mre.Set();
             };
-            consumer.OnErrorEvent += (exception, result) =>
+            consumer.OnErrorEvent += (e, r) =>
             {
-                Assert.Fail(exception.ToString());
+                isFaulted = true;
+                exception = e;
+                mre.Set();
             };
 
             // Wait for consumer startup
             await Task.Delay(500);
             
-            await ProduceMessage(topic, message);
+            await ProduceMessage(_currentTopic, message);
 
             mre.WaitOne();
+            
+            if (isFaulted)
+            {
+                Assert.Fail(exception.ToString());
+            }
         }
         
         [Test]
         public async Task RunAsync_GivenMultipleMessages_ShouldConsumeMessage()
         {
-            var topic = "MyTopic";
-            var consumer = await StartKafkaConsumer(topic);
+            var consumer = await StartKafkaConsumer(_currentTopic);
+            var isFaulted = false;
+            var exception = null as Exception;
             var mre = new ManualResetEvent(false);
             var messages = CreateRandomMessages(50);
             var count = 0;
@@ -101,14 +127,16 @@ namespace Trendyol.Confluent.Kafka.Tests
                     .Contain(result.Message.Value);
                 count++;
 
-                if (count == 50)
+                if (count == messages.Count)
                 {
                     mre.Set();
                 }
             };
-            consumer.OnErrorEvent += (exception, result) =>
+            consumer.OnErrorEvent += (e, r) =>
             {
-                Assert.Fail(exception.ToString());
+                isFaulted = true;
+                exception = e;
+                mre.Set();
             };
 
             // Wait for consumer startup
@@ -116,10 +144,15 @@ namespace Trendyol.Confluent.Kafka.Tests
 
             foreach (var message in messages)
             {
-                await ProduceMessage(topic, message);
+                await ProduceMessage(_currentTopic, message);
             }
-
+            
             mre.WaitOne();
+
+            if (isFaulted)
+            {
+                Assert.Fail(exception.ToString());
+            }
         }
     }
 }
