@@ -123,7 +123,7 @@ namespace Trendyol.Confluent.Kafka.Tests
         }
         
         [Test]
-        public async Task RunAsync_GivenValidConfigurationAndProducedMultipleMessage_ShouldConsumeMessages()
+        public async Task RunAsync_GivenValidConfigurationAndProducedMultipleMessages_ShouldConsumeMessages()
         {
             var topic = Guid.NewGuid().ToString();
             var bootstrapServers = Constants.BootstrapServers;
