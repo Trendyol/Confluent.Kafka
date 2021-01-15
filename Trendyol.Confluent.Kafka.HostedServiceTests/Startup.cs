@@ -27,7 +27,7 @@ namespace Trendyol.Confluent.Kafka.HostedServiceTests
             
             services.AddKafkaConsumer<MyConsumer>(configuration =>
             {
-                configuration.Topics = new[] {Guid.NewGuid().ToString()};
+                configuration.Topic = Guid.NewGuid().ToString();
                 configuration.GroupId = Guid.NewGuid().ToString();
                 configuration.BootstrapServers = _configuration.GetValue<string>("BootstrapServers");
                 configuration.AutoOffsetReset = AutoOffsetReset.Earliest;
