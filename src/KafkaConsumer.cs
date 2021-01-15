@@ -8,9 +8,10 @@ namespace Trendyol.Confluent.Kafka
 {
     public abstract class KafkaConsumer : IKafkaConsumer
     {
+        protected IConsumer<string, string>? Consumer;
         private bool _initialized;
         private KafkaConfiguration? _configuration;
-        protected IConsumer<string, string>? Consumer;
+        private bool _disposed;
 
         public KafkaConsumer()
         {
@@ -106,6 +107,7 @@ namespace Trendyol.Confluent.Kafka
             }
             
             Consumer.Close();
+            _disposed = true;
         }
         
         private void ValidateConfiguration(KafkaConfiguration? configuration)
@@ -141,5 +143,16 @@ namespace Trendyol.Confluent.Kafka
         
         protected abstract Task OnConsume(ConsumeResult<string, string> result);
         protected abstract Task OnError(Exception exception, ConsumeResult<string, string>? result);
+
+        public virtual void Dispose()
+        {
+            if (_disposed)
+            {
+                return;
+            }
+            
+            Consumer?.Close();
+            _disposed = true;
+        }
     }
 }
