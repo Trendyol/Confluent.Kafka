@@ -6,6 +6,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Trendyol.Confluent.Kafka.Te
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Trendyol.Confluent.Kafka.HostedServiceTests", "Trendyol.Confluent.Kafka.HostedServiceTests\Trendyol.Confluent.Kafka.HostedServiceTests.csproj", "{8859BF09-C9B6-4778-BCC9-8CFF56634868}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{8CFA7ACA-F4A5-4A88-B6A7-047B88129AA7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{7EE28F4D-44A2-4124-9935-4B0C2BDBEA1E}"
+ProjectSection(SolutionItems) = preProject
+	.github\workflows\ci.yml = .github\workflows\ci.yml
+EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +31,8 @@ Global
 		{8859BF09-C9B6-4778-BCC9-8CFF56634868}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8859BF09-C9B6-4778-BCC9-8CFF56634868}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8859BF09-C9B6-4778-BCC9-8CFF56634868}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{7EE28F4D-44A2-4124-9935-4B0C2BDBEA1E} = {8CFA7ACA-F4A5-4A88-B6A7-047B88129AA7}
 	EndGlobalSection
 EndGlobal
