@@ -26,21 +26,21 @@ namespace Trendyol.Confluent.Kafka
         {
             if (_initialized)
                 throw new InvalidOperationException(KafkaConsumerIsAlreadyInitializedMessage);
-            
+
             _configuration = configuration;
-            
+
             ValidateConfiguration(_configuration);
-            
+
             Consumer = BuildConsumer(configuration);
-            
+
             _initialized = true;
         }
-        
+
         public Task RunAsync(CancellationToken cancellationToken = default)
         {
             if (!_initialized)
                 throw new InvalidOperationException(KafkaConsumerIsNotInitializedMessage);
-            
+
             Task.Factory.StartNew(async () =>
                 {
                     // KafkaConsumer is initialized and _configuration cannot be null
@@ -54,69 +54,75 @@ namespace Trendyol.Confluent.Kafka
         private async Task StartConsumeLoop(KafkaConfiguration kafkaConfiguration, CancellationToken token)
         {
             // KafkaConsumer is initialized and Consumer cannot be null
-            Consumer!.Subscribe(kafkaConfiguration.Topics);
+            // Topics is validated, and cannot be null, or cannot contain null topic
+            Consumer.Subscribe(kafkaConfiguration.Topics);
 
-            while (!token.IsCancellationRequested)
+            try
             {
-                try
+                while (!token.IsCancellationRequested)
                 {
-                    var result = null as ConsumeResult<string, string>;
-
                     try
                     {
-                        result = Consumer.Consume(token);
-                    }
-                    catch (ConsumeException e)
-                    {
-                        await OnError(e, result);
-                        continue;
-                    }
+                        var result = null as ConsumeResult<string, string>;
 
-                    if (result.Message == null)
-                        continue;
+                        try
+                        {
+                            result = Consumer.Consume(token);
+                        }
+                        catch (ConsumeException e)
+                        {
+                            await OnError(e, result);
+                            continue;
+                        }
 
-                    try
+                        if (result.Message == null)
+                            continue;
+
+                        try
+                        {
+                            await OnConsume(result);
+                        }
+                        catch (Exception e)
+                        {
+                            await OnError(e, result);
+                        }
+                    }
+                    catch (OperationCanceledException)
                     {
-                        await OnConsume(result);
+                        break;
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                        break;
+                    }
+                    catch (AccessViolationException)
+                    {
+                        break;
+                    }
+                    catch (BadImageFormatException)
+                    {
+                        break;
                     }
                     catch (Exception e)
                     {
-                        await OnError(e, result);
+                        await OnError(e, null);
                     }
                 }
-                catch (OperationCanceledException)
-                {
-                    break;
-                }
-                catch (ObjectDisposedException)
-                {
-                    break;
-                }
-                catch (AccessViolationException)
-                {
-                    break;
-                }
-                catch (BadImageFormatException)
-                {
-                    break;
-                }
-                catch (Exception e)
-                {
-                    await OnError(e, null);
-                }
             }
-            
-            Consumer.Close();
-            _disposed = true;
+            finally
+            {
+                Consumer.Close();
+                _disposed = true;
+            }
         }
-        
+
         private void ValidateConfiguration(KafkaConfiguration configuration)
         {
             if (configuration == null)
                 throw new ArgumentNullException(nameof(KafkaConfiguration));
 
             var topics = configuration.Topics;
-            
+
             if (topics == null)
                 throw new ArgumentNullException(nameof(KafkaConfiguration.Topics));
 
@@ -140,7 +146,7 @@ namespace Trendyol.Confluent.Kafka
                 .SetPartitionsRevokedHandler(configuration.PartitionsRevokedHandler)
                 .Build();
         }
-        
+
         protected abstract Task OnConsume(ConsumeResult<string, string> result);
         protected abstract Task OnError(Exception exception, ConsumeResult<string, string> result);
 
@@ -150,7 +156,7 @@ namespace Trendyol.Confluent.Kafka
             {
                 return;
             }
-            
+
             Consumer?.Close();
             _disposed = true;
         }
