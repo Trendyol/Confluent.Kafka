@@ -24,7 +24,7 @@ namespace Trendyol.Confluent.Kafka.Tests
             return Task.CompletedTask;
         }
 
-        protected override Task OnError(Exception exception, ConsumeResult<string, string>? result)
+        protected override Task OnError(Exception exception, ConsumeResult<string, string> result)
         {
             OnErrorEvent.Invoke(exception, result);
             
