@@ -24,7 +24,7 @@ namespace Trendyol.Confluent.Kafka.HostedServiceTests
             return Task.CompletedTask;
         }
 
-        protected override Task OnError(Exception exception, ConsumeResult<string, string>? result)
+        protected override Task OnError(Exception exception, ConsumeResult<string, string> result)
         {
             _service.WriteToConsole(exception.ToString());
             _service.WriteToConsole(result?.ToString() ?? "consumeResult : null");
