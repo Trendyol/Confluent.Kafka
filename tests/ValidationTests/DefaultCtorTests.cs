@@ -17,12 +17,10 @@ namespace Trendyol.Confluent.Kafka.Tests.ValidationTests
         {
             var consumer = new TestConsumer();
 
-            var exception = Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            _ = Assert.ThrowsAsync<InvalidOperationException>(async () =>
             {
                 await consumer.RunAsync();
             });
-
-            exception.Message.Should().Be(ErrorConstants.KafkaConsumerIsNotInitializedMessage);
         }
     }
 }

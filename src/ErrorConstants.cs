@@ -1,6 +1,6 @@
 namespace Trendyol.Confluent.Kafka
 {
-    public static class ErrorConstants
+    internal static class ErrorConstants
     {
         public const string KafkaConsumerIsAlreadyInitializedMessage =
             "KafkaConsumer is already initialized.";
