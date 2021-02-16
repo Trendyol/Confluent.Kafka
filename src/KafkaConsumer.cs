@@ -105,7 +105,7 @@ namespace Trendyol.Confluent.Kafka
                     }
                     catch (Exception e)
                     {
-                        await OnError(e, null);
+                        await LogError(e);
                     }
                 }
             }
@@ -113,6 +113,18 @@ namespace Trendyol.Confluent.Kafka
             {
                 Consumer.Close();
                 _disposed = true;
+            }
+        }
+
+        private async Task LogError(Exception e)
+        {
+            if (_configuration.ErrorHandler != null)
+            {
+                _configuration.ErrorHandler(Consumer, new Error(ErrorCode.Local_Application, e.ToString()));
+            }
+            else
+            {
+                await Console.Error.WriteLineAsync(e.ToString());
             }
         }
 
@@ -148,7 +160,7 @@ namespace Trendyol.Confluent.Kafka
         }
 
         protected abstract Task OnConsume(ConsumeResult<string, string> result);
-        protected abstract Task OnError(Exception exception, ConsumeResult<string, string> result);
+        protected abstract Task OnError(Exception exception, ConsumeResult<string, string>? result);
 
         public virtual void Dispose()
         {
