@@ -27,17 +27,7 @@ class EventConsumer : KafkaConsumer
 }
 ```
 
-You can create an instance of your `EventConsumer` via parameterized constructor:
-``` cs
-var config = new KafkaConfiguration()
-{
-    Topic = "MyEvent",
-    BootstrapServers = "BOOTSTRAP_SERVERS",
-    GroupId = "myEventGroup",
-};
-var consumer = new EventConsumer(config);
-```
-or via using default constructor and `Initialize(config)` method:
+You can create an instance of your `EventConsumer` via using default constructor and `Initialize(config)` method:
 ``` cs
 var config = new KafkaConfiguration()
 {
