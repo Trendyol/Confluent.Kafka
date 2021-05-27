@@ -12,7 +12,7 @@ namespace Trendyol.Confluent.Kafka.Tests.ValidationTests
         public void TopicProperty_GivenValidTopic_ShouldSetAndGetTopicProperty()
         {
             var topic = Guid.NewGuid().ToString();
-            var config = new KafkaConfiguration
+            var config = new KafkaConsumerConfig
             {
                 Topic = topic
             };
@@ -25,19 +25,19 @@ namespace Trendyol.Confluent.Kafka.Tests.ValidationTests
         {
             var exception = Assert.Throws<ArgumentNullException>(() =>
             {
-                _ = new KafkaConfiguration
+                _ = new KafkaConsumerConfig
                 {
                     Topic = null
                 };
             });
 
-            exception.Message.Should().Contain(nameof(KafkaConfiguration.Topic));
+            exception.Message.Should().Contain(nameof(KafkaConsumerConfig.Topic));
         }
         
         [Test]
         public void TopicProperty_GivenNullTopics_TopicShouldBeNull()
         {
-            var config = new KafkaConfiguration
+            var config = new KafkaConsumerConfig
             {
                 Topics = new[] {null as string}
             };
@@ -48,7 +48,7 @@ namespace Trendyol.Confluent.Kafka.Tests.ValidationTests
         [Test]
         public void TopicProperty_GivenValidTopicAndNullTopicsProperty_ShouldSetTopic()
         {
-            var config = new KafkaConfiguration
+            var config = new KafkaConsumerConfig
             {
             };
 
@@ -63,7 +63,7 @@ namespace Trendyol.Confluent.Kafka.Tests.ValidationTests
         public void TopicProperty_GivenTopic_ShouldGetTopics()
         {
             var topic = "myTopic";
-            var config = new KafkaConfiguration
+            var config = new KafkaConsumerConfig
             {
                 Topic = topic
             };
@@ -74,7 +74,7 @@ namespace Trendyol.Confluent.Kafka.Tests.ValidationTests
         public void TopicProperty_GivenTopics_ShouldGetTopic()
         {
             var topic = "myTopic";
-            var config = new KafkaConfiguration
+            var config = new KafkaConsumerConfig
             {
                 Topics = new []{topic}
             };

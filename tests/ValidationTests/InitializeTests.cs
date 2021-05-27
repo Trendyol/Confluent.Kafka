@@ -9,7 +9,7 @@ namespace Trendyol.Confluent.Kafka.Tests.ValidationTests
         [Test]
         public void Initialize_GivenNoGroupId_ShouldThrowArgumentException()
         {
-            var config = new KafkaConfiguration
+            var config = new KafkaConsumerConfig
             {
                 Topics = new[] {"MyTopic"}
             };
@@ -25,7 +25,7 @@ namespace Trendyol.Confluent.Kafka.Tests.ValidationTests
         [Test]
         public void Initialize_GivenNoTopics_ShouldThrowArgumentNullException()
         {
-            var config = new KafkaConfiguration
+            var config = new KafkaConsumerConfig
             {
             };
             var consumer = new TestConsumer();
@@ -34,13 +34,13 @@ namespace Trendyol.Confluent.Kafka.Tests.ValidationTests
             {
                 consumer.Initialize(config);
             });
-            exception.Message.Should().Contain(nameof(KafkaConfiguration.Topics));
+            exception.Message.Should().Contain(nameof(KafkaConsumerConfig.Topics));
         }
         
         [Test]
         public void Initialize_GivenNoTopicInTopics_ShouldThrowArgumentNullException()
         {
-            var config = new KafkaConfiguration
+            var config = new KafkaConsumerConfig
             {
                 Topics = new [] {null as string}
             };
@@ -56,7 +56,7 @@ namespace Trendyol.Confluent.Kafka.Tests.ValidationTests
         [Test]
         public void Initialize_IfAlreadyInitialized_ShouldThrowInvalidOperationException()
         {
-            var config = new KafkaConfiguration
+            var config = new KafkaConsumerConfig
             {
                 GroupId = "groupId",
                 Topics = new []{"topic"}
@@ -74,7 +74,7 @@ namespace Trendyol.Confluent.Kafka.Tests.ValidationTests
         [Test]
         public void Initialize_IfAlreadyInitializedWithCtor_ShouldThrowInvalidOperationException()
         {
-            var config = new KafkaConfiguration
+            var config = new KafkaConsumerConfig
             {
                 GroupId = "groupId",
                 Topics = new []{"topic"}

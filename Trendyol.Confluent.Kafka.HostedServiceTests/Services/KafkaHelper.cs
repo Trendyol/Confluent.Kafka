@@ -9,32 +9,32 @@ namespace Trendyol.Confluent.Kafka.HostedServiceTests.Services
 {
     public class KafkaHelper : IKafkaHelper
     {
-        private KafkaConfiguration _configuration;
+        private KafkaConsumerConfig _consumerConfig;
         
-        public async Task CreateTopic(KafkaConfiguration configuration)
+        public async Task CreateTopic(KafkaConsumerConfig consumerConfig)
         {
-            _configuration = configuration;
+            _consumerConfig = consumerConfig;
             
-            var topic = configuration.Topics!.First();
+            var topic = consumerConfig.Topics!.First();
 
-            await AdminClientHelper.CreateTopicAsync(configuration.BootstrapServers,
+            await AdminClientHelper.CreateTopicAsync(consumerConfig.BootstrapServers,
                 topic,
                 10);
         }
 
-        public void BeginProducingMessages(KafkaConfiguration configuration)
+        public void BeginProducingMessages(KafkaConsumerConfig consumerConfig)
         {
             new Thread(async () =>
             {
                 var producer = new ProducerBuilder<string, string>(new ProducerConfig
                 {
-                    BootstrapServers = configuration.BootstrapServers
+                    BootstrapServers = consumerConfig.BootstrapServers
                 })
                     .Build();
 
                 while (true)
                 {
-                    await producer.ProduceAsync(configuration.Topics!.First(), new Message<string, string>
+                    await producer.ProduceAsync(consumerConfig.Topics!.First(), new Message<string, string>
                     {
                         Key = Guid.NewGuid().ToString(),
                         Value = Guid.NewGuid().ToString()
@@ -45,7 +45,7 @@ namespace Trendyol.Confluent.Kafka.HostedServiceTests.Services
 
         public async Task DeleteTopics()
         {
-            await AdminClientHelper.DeleteTopicsAsync(_configuration.BootstrapServers, _configuration.Topics!);
+            await AdminClientHelper.DeleteTopicsAsync(_consumerConfig.BootstrapServers, _consumerConfig.Topics!);
         }
     }
 }

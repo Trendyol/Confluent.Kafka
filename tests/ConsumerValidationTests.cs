@@ -13,7 +13,7 @@ namespace Trendyol.Confluent.Kafka.Tests
         [Test]
         public void RunAsync_GivenValidConfigurationInConstructor_ShouldStartSuccessfully()
         {
-            var configuration = new KafkaConfiguration
+            var configuration = new KafkaConsumerConfig
             {
                 Topics = new [] {Guid.NewGuid().ToString()},
                 BootstrapServers = Constants.BootstrapServers,
@@ -44,7 +44,7 @@ namespace Trendyol.Confluent.Kafka.Tests
         public void RunAsync_GivenNullTopics_ShouldThrowArgumentNullException()
         {
             var consumer = new TestConsumer();
-            var configuration = new KafkaConfiguration
+            var configuration = new KafkaConsumerConfig
             {
             };
 
@@ -52,14 +52,14 @@ namespace Trendyol.Confluent.Kafka.Tests
             {
                 consumer.Initialize(configuration);
             });
-            exception.ParamName.Should().Be(nameof(KafkaConfiguration.Topics));
+            exception.ParamName.Should().Be(nameof(KafkaConsumerConfig.Topics));
         }
         
         [Test]
         public void RunAsync_GivenTopicsWithNullTopic_ShouldThrowArgumentNullException()
         {
             var consumer = new TestConsumer();
-            var configuration = new KafkaConfiguration
+            var configuration = new KafkaConsumerConfig
             {
                 Topics = new []{null as string}
             };
@@ -75,7 +75,7 @@ namespace Trendyol.Confluent.Kafka.Tests
         public void RunAsync_GivenNoGroupId_ShouldThrowArgumentException()
         {
             var consumer = new TestConsumer();
-            var configuration = new KafkaConfiguration
+            var configuration = new KafkaConsumerConfig
             {
                 Topics = new []{"TestTopic"}
             };
@@ -91,7 +91,7 @@ namespace Trendyol.Confluent.Kafka.Tests
         public async Task RunAsync_GivenValidConfiguration_ShouldStartSuccessfully()
         {
             var consumer = new TestConsumer();
-            var configuration = new KafkaConfiguration
+            var configuration = new KafkaConsumerConfig
             {
                 Topics = new []{"TestTopic"},
                 GroupId = Guid.NewGuid().ToString()

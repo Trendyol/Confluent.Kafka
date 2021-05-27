@@ -57,7 +57,7 @@ namespace Trendyol.Confluent.Kafka.Tests
         private async Task<TestConsumer> StartKafkaConsumer(string topic)
         {
             var consumer = new TestConsumer();
-            var configuration = new KafkaConfiguration
+            var configuration = new KafkaConsumerConfig
             {
                 Topics = new []{topic},
                 BootstrapServers = Constants.BootstrapServers,

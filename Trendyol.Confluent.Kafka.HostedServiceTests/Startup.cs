@@ -11,7 +11,7 @@ namespace Trendyol.Confluent.Kafka.HostedServiceTests
     public class Startup
     {
         private readonly IConfiguration _configuration;
-        private KafkaConfiguration _kafkaConfiguration;
+        private KafkaConsumerConfig _kafkaConsumerConfig;
 
         public Startup(IConfiguration configuration)
         {
@@ -32,7 +32,7 @@ namespace Trendyol.Confluent.Kafka.HostedServiceTests
                 configuration.BootstrapServers = _configuration.GetValue<string>("BootstrapServers");
                 configuration.AutoOffsetReset = AutoOffsetReset.Earliest;
 
-                _kafkaConfiguration = configuration;
+                _kafkaConsumerConfig = configuration;
             });
 
             services.AddSingleton(_configuration);
@@ -42,8 +42,8 @@ namespace Trendyol.Confluent.Kafka.HostedServiceTests
         {
             var kafkaHelper = app.ApplicationServices.GetRequiredService<IKafkaHelper>();
             
-            kafkaHelper.CreateTopic(_kafkaConfiguration);
-            kafkaHelper.BeginProducingMessages(_kafkaConfiguration);
+            kafkaHelper.CreateTopic(_kafkaConsumerConfig);
+            kafkaHelper.BeginProducingMessages(_kafkaConsumerConfig);
         }
     }
 }

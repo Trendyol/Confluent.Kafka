@@ -10,7 +10,7 @@ namespace Trendyol.Confluent.Kafka.Tests
         {
         }
 
-        public TestConsumer(KafkaConfiguration configuration) : base(configuration)
+        public TestConsumer(KafkaConsumerConfig consumerConfig) : base(consumerConfig)
         {
         }
         

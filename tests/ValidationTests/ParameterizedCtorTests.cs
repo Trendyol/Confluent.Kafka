@@ -9,7 +9,7 @@ namespace Trendyol.Confluent.Kafka.Tests.ValidationTests
         [Test]
         public void GivenValidConfiguration_ShouldCreateTestConsumer()
         {
-            var config = new KafkaConfiguration
+            var config = new KafkaConsumerConfig
             {
                 Topics = new[] {"MyTopic"},
                 GroupId = "groupId"
@@ -20,7 +20,7 @@ namespace Trendyol.Confluent.Kafka.Tests.ValidationTests
         [Test]
         public void GivenNoGroupId_ShouldThrowArgumentException()
         {
-            var config = new KafkaConfiguration
+            var config = new KafkaConsumerConfig
             {
                 Topics = new[] {"MyTopic"}
             };
@@ -34,7 +34,7 @@ namespace Trendyol.Confluent.Kafka.Tests.ValidationTests
         [Test]
         public void GivenNoTopics_ShouldThrowArgumentNullException()
         {
-            var config = new KafkaConfiguration
+            var config = new KafkaConsumerConfig
             {
                 Topics = null,
                 GroupId = "groupId"
@@ -43,13 +43,13 @@ namespace Trendyol.Confluent.Kafka.Tests.ValidationTests
             {
                 _ = new TestConsumer(config);
             });
-            exception.Message.Should().Contain(nameof(KafkaConfiguration.Topics));
+            exception.Message.Should().Contain(nameof(KafkaConsumerConfig.Topics));
         }
         
         [Test]
         public void GivenNoTopicInTopics_ShouldThrowArgumentNullException()
         {
-            var config = new KafkaConfiguration
+            var config = new KafkaConsumerConfig
             {
                 Topics = new []{null as string},
                 GroupId = "groupId"
@@ -68,7 +68,7 @@ namespace Trendyol.Confluent.Kafka.Tests.ValidationTests
             {
                 _ = new TestConsumer(null);
             });
-            exception.Message.Should().Contain(nameof(KafkaConfiguration));
+            exception.Message.Should().Contain(nameof(KafkaConsumerConfig));
         }
         
         [Test]

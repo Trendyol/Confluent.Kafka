@@ -5,7 +5,7 @@ using Confluent.Kafka;
 
 namespace Trendyol.Confluent.Kafka
 {
-    public class KafkaConfiguration : ConsumerConfig
+    public class KafkaConsumerConfig : ConsumerConfig
     {
         public Action<IConsumer<string, string>, Error> ErrorHandler { get; set; }
         public Action<IConsumer<string, string>, LogMessage> LogHandler { get; set; }

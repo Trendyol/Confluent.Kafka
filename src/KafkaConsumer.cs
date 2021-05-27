@@ -10,28 +10,28 @@ namespace Trendyol.Confluent.Kafka
     {
         protected IConsumer<string, string> Consumer;
         private bool _initialized;
-        private KafkaConfiguration _configuration;
+        private KafkaConsumerConfig _consumerConfig;
         private bool _disposed;
 
         public KafkaConsumer()
         {
         }
 
-        public KafkaConsumer(KafkaConfiguration configuration)
+        public KafkaConsumer(KafkaConsumerConfig consumerConfig)
         {
-            Initialize(configuration);
+            Initialize(consumerConfig);
         }
 
-        public void Initialize(KafkaConfiguration configuration)
+        public void Initialize(KafkaConsumerConfig consumerConfig)
         {
             if (_initialized)
                 throw new InvalidOperationException(KafkaConsumerIsAlreadyInitializedMessage);
 
-            _configuration = configuration;
+            _consumerConfig = consumerConfig;
 
-            ValidateConfiguration(_configuration);
+            ValidateConfiguration(_consumerConfig);
 
-            Consumer = BuildConsumer(configuration);
+            Consumer = BuildConsumer(consumerConfig);
 
             _initialized = true;
         }
@@ -44,18 +44,18 @@ namespace Trendyol.Confluent.Kafka
             Task.Factory.StartNew(async () =>
                 {
                     // KafkaConsumer is initialized and _configuration cannot be null
-                    await StartConsumeLoop(_configuration!, cancellationToken);
+                    await StartConsumeLoop(_consumerConfig!, cancellationToken);
                 },
                 cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
             return Task.CompletedTask;
         }
 
-        private async Task StartConsumeLoop(KafkaConfiguration kafkaConfiguration, CancellationToken token)
+        private async Task StartConsumeLoop(KafkaConsumerConfig kafkaConsumerConfig, CancellationToken token)
         {
             // KafkaConsumer is initialized and Consumer cannot be null
             // Topics is validated, and cannot be null, or cannot contain null topic
-            Consumer.Subscribe(kafkaConfiguration.Topics);
+            Consumer.Subscribe(kafkaConsumerConfig.Topics);
 
             try
             {
@@ -118,9 +118,9 @@ namespace Trendyol.Confluent.Kafka
 
         private async Task LogError(Exception e)
         {
-            if (_configuration.ErrorHandler != null)
+            if (_consumerConfig.ErrorHandler != null)
             {
-                _configuration.ErrorHandler(Consumer, new Error(ErrorCode.Local_Application, e.ToString()));
+                _consumerConfig.ErrorHandler(Consumer, new Error(ErrorCode.Local_Application, e.ToString()));
             }
             else
             {
@@ -128,34 +128,34 @@ namespace Trendyol.Confluent.Kafka
             }
         }
 
-        private void ValidateConfiguration(KafkaConfiguration configuration)
+        private void ValidateConfiguration(KafkaConsumerConfig consumerConfig)
         {
-            if (configuration == null)
-                throw new ArgumentNullException(nameof(KafkaConfiguration));
+            if (consumerConfig == null)
+                throw new ArgumentNullException(nameof(KafkaConsumerConfig));
 
-            var topics = configuration.Topics;
+            var topics = consumerConfig.Topics;
 
             if (topics == null)
-                throw new ArgumentNullException(nameof(KafkaConfiguration.Topics));
+                throw new ArgumentNullException(nameof(KafkaConsumerConfig.Topics));
 
             foreach (var topic in topics)
                 if (topic == null)
                     throw new ArgumentNullException(nameof(topic));
         }
 
-        private IConsumer<string, string> BuildConsumer(KafkaConfiguration configuration)
+        private IConsumer<string, string> BuildConsumer(KafkaConsumerConfig consumerConfig)
         {
-            var consumerConfig = configuration as ConsumerConfig;
+            var cfg = consumerConfig as ConsumerConfig;
 
-            return new ConsumerBuilder<string, string>(consumerConfig)
-                .SetErrorHandler(configuration.ErrorHandler)
-                .SetKeyDeserializer(configuration.KeyDeserializer)
-                .SetValueDeserializer(configuration.ValueDeserializer)
-                .SetLogHandler(configuration.LogHandler)
-                .SetStatisticsHandler(configuration.StatisticsHandler)
-                .SetOffsetsCommittedHandler(configuration.OffsetsCommittedHandler)
-                .SetPartitionsAssignedHandler(configuration.PartitionsAssignedHandler)
-                .SetPartitionsRevokedHandler(configuration.PartitionsRevokedHandler)
+            return new ConsumerBuilder<string, string>(cfg)
+                .SetErrorHandler(consumerConfig.ErrorHandler)
+                .SetKeyDeserializer(consumerConfig.KeyDeserializer)
+                .SetValueDeserializer(consumerConfig.ValueDeserializer)
+                .SetLogHandler(consumerConfig.LogHandler)
+                .SetStatisticsHandler(consumerConfig.StatisticsHandler)
+                .SetOffsetsCommittedHandler(consumerConfig.OffsetsCommittedHandler)
+                .SetPartitionsAssignedHandler(consumerConfig.PartitionsAssignedHandler)
+                .SetPartitionsRevokedHandler(consumerConfig.PartitionsRevokedHandler)
                 .Build();
         }
 

@@ -9,6 +9,10 @@ namespace Trendyol.Confluent.Kafka.HostedServiceTests
     {
         private readonly IService _service;
 
+        public MyConsumer(KafkaConsumerConfig config) : base(config)
+        {
+        }
+
         public MyConsumer(IService service)
         {
             _service = service;
