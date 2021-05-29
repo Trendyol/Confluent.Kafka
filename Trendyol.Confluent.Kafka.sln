@@ -2,10 +2,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Trendyol.Confluent.Kafka", "src\Trendyol.Confluent.Kafka.csproj", "{0818D833-CC41-47DB-AE3E-17C734E1B05F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Trendyol.Confluent.Kafka.Tests", "tests\Trendyol.Confluent.Kafka.Tests.csproj", "{984D13B0-C3BA-4798-90EE-16157D7B2E23}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Trendyol.Confluent.Kafka.Example", "Trendyol.Confluent.Kafka.Example\Trendyol.Confluent.Kafka.Example.csproj", "{8859BF09-C9B6-4778-BCC9-8CFF56634868}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{8CFA7ACA-F4A5-4A88-B6A7-047B88129AA7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{7EE28F4D-44A2-4124-9935-4B0C2BDBEA1E}"
@@ -13,7 +9,11 @@ ProjectSection(SolutionItems) = preProject
 	.github\workflows\ci.yml = .github\workflows\ci.yml
 EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Trendyol.Confluent.Kafka.IntegrationTests", "Trendyol.Confluent.Kafka.IntegrationTests\Trendyol.Confluent.Kafka.IntegrationTests.csproj", "{FA29ABB8-2A75-4A5F-A980-5B0EDC8F67B2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Trendyol.Confluent.Kafka.Example", "example\Trendyol.Confluent.Kafka.Example.csproj", "{496E291A-C6B2-400C-9CA2-7392EED4D6E6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Trendyol.Confluent.Kafka.IntegrationTests", "integrationtests\Trendyol.Confluent.Kafka.IntegrationTests.csproj", "{A42FC793-252B-4BB5-AE70-6AFBBB5A5B6E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Trendyol.Confluent.Kafka.UnitTests", "unittests\Trendyol.Confluent.Kafka.UnitTests.csproj", "{A977AB48-9A15-4721-9C32-99139D429CEE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,18 +25,18 @@ Global
 		{0818D833-CC41-47DB-AE3E-17C734E1B05F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0818D833-CC41-47DB-AE3E-17C734E1B05F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0818D833-CC41-47DB-AE3E-17C734E1B05F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{984D13B0-C3BA-4798-90EE-16157D7B2E23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{984D13B0-C3BA-4798-90EE-16157D7B2E23}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{984D13B0-C3BA-4798-90EE-16157D7B2E23}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{984D13B0-C3BA-4798-90EE-16157D7B2E23}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8859BF09-C9B6-4778-BCC9-8CFF56634868}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8859BF09-C9B6-4778-BCC9-8CFF56634868}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8859BF09-C9B6-4778-BCC9-8CFF56634868}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8859BF09-C9B6-4778-BCC9-8CFF56634868}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FA29ABB8-2A75-4A5F-A980-5B0EDC8F67B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FA29ABB8-2A75-4A5F-A980-5B0EDC8F67B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FA29ABB8-2A75-4A5F-A980-5B0EDC8F67B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FA29ABB8-2A75-4A5F-A980-5B0EDC8F67B2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{496E291A-C6B2-400C-9CA2-7392EED4D6E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{496E291A-C6B2-400C-9CA2-7392EED4D6E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{496E291A-C6B2-400C-9CA2-7392EED4D6E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{496E291A-C6B2-400C-9CA2-7392EED4D6E6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A42FC793-252B-4BB5-AE70-6AFBBB5A5B6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A42FC793-252B-4BB5-AE70-6AFBBB5A5B6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A42FC793-252B-4BB5-AE70-6AFBBB5A5B6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A42FC793-252B-4BB5-AE70-6AFBBB5A5B6E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A977AB48-9A15-4721-9C32-99139D429CEE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A977AB48-9A15-4721-9C32-99139D429CEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A977AB48-9A15-4721-9C32-99139D429CEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A977AB48-9A15-4721-9C32-99139D429CEE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{7EE28F4D-44A2-4124-9935-4B0C2BDBEA1E} = {8CFA7ACA-F4A5-4A88-B6A7-047B88129AA7}
