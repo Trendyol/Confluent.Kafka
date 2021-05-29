@@ -5,18 +5,18 @@ using Trendyol.Confluent.Kafka.HostedServiceTests.Services;
 
 namespace Trendyol.Confluent.Kafka.HostedServiceTests
 {
-    public class MyHostedService : BackgroundService
+    public class Daemon : BackgroundService
     {
         private readonly MyConsumer _myConsumer;
         private readonly IKafkaHelper _kafkaHelper;
-        
-        public MyHostedService(MyConsumer myConsumer, 
+
+        public Daemon(MyConsumer myConsumer,
             IKafkaHelper kafkaHelper)
         {
             _myConsumer = myConsumer;
             _kafkaHelper = kafkaHelper;
         }
-        
+
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             await _myConsumer.RunAsync(stoppingToken);
@@ -25,7 +25,7 @@ namespace Trendyol.Confluent.Kafka.HostedServiceTests
         public override void Dispose()
         {
             _kafkaHelper.DeleteTopics();
-            
+
             base.Dispose();
         }
     }

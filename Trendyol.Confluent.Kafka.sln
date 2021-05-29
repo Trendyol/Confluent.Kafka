@@ -4,7 +4,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Trendyol.Confluent.Kafka", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Trendyol.Confluent.Kafka.Tests", "tests\Trendyol.Confluent.Kafka.Tests.csproj", "{984D13B0-C3BA-4798-90EE-16157D7B2E23}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Trendyol.Confluent.Kafka.HostedServiceTests", "Trendyol.Confluent.Kafka.HostedServiceTests\Trendyol.Confluent.Kafka.HostedServiceTests.csproj", "{8859BF09-C9B6-4778-BCC9-8CFF56634868}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Trendyol.Confluent.Kafka.Example", "Trendyol.Confluent.Kafka.Example\Trendyol.Confluent.Kafka.Example.csproj", "{8859BF09-C9B6-4778-BCC9-8CFF56634868}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{8CFA7ACA-F4A5-4A88-B6A7-047B88129AA7}"
 EndProject
