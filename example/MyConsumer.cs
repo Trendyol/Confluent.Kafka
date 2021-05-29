@@ -22,9 +22,9 @@ namespace Trendyol.Confluent.Kafka.HostedServiceTests
         {
             var resultMessage = result.Message;
             var output = $"Key : {resultMessage.Key}, Value : {resultMessage.Value}";
-            
+
             _service.WriteToConsole(output);
-            
+
             return Task.CompletedTask;
         }
 
@@ -32,7 +32,7 @@ namespace Trendyol.Confluent.Kafka.HostedServiceTests
         {
             _service.WriteToConsole(exception.ToString());
             _service.WriteToConsole(result?.ToString() ?? "consumeResult : null");
-            
+
             return Task.CompletedTask;
         }
     }

@@ -23,7 +23,7 @@ namespace Trendyol.Confluent.Kafka.HostedServiceTests
             services.AddScoped<IService, Service>();
             services.AddScoped<IKafkaHelper, KafkaHelper>();
 
-            services.AddHostedService<MyHostedService>();
+            services.AddHostedService<Daemon>();
             
             services.AddKafkaConsumer<MyConsumer>(configuration =>
             {

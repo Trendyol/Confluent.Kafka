@@ -68,7 +68,7 @@ namespace Trendyol.Confluent.Kafka.Tests.ValidationTests
             {
                 consumer.Initialize(config);
             });
-            exception.Message.Should().Be("KafkaConsumer is already initialized.");
+            exception.Message.Should().Be("KafkaConsumer is already initialized via its parameterized constructor.");
         }
         
         [Test]
@@ -85,7 +85,7 @@ namespace Trendyol.Confluent.Kafka.Tests.ValidationTests
             {
                 consumer.Initialize(config);
             });
-            exception.Message.Should().Be("KafkaConsumer is already initialized.");
+            exception.Message.Should().Be("KafkaConsumer is already initialized via its parameterized constructor.");
         }
     }
 }
