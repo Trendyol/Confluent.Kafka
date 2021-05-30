@@ -18,8 +18,8 @@ jobs:
       - name: Restore
         run: dotnet restore
       - name: Build
-        run: dotnet build --no-restore
+        run: dotnet build -c Release --no-restore
       - name: Setup Docker Daemon
         uses: docker/setup-buildx-action@v1
       - name: Run Unit & Integration Tests
-        run: dotnet test
+        run: dotnet test -c Release --no-restore --no-build
